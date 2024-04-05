@@ -16,7 +16,7 @@
 <expr> ::= (<id> | <const>) [<operator> (<id> | <const>)]
     <operator> ::= <op_assign> | <op_arithm> | <op_logic> | <op_cmp>
         <op_assign> ::= "="
-        <op_arithm> ::= "+" | "-" | "*" | "/"
+        <op_arithm> ::= "+" | "-" | "*" | "/" | "%"
         <op_logic> ::= "+" | "*" | "~"
         <op_cmp> ::= "==" | "!=" | ">" | ">=" | "<" | "<="
 
