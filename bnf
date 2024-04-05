@@ -24,8 +24,9 @@
     <type> ::= "int" | "float" | "bool" | "str"
     <var> ::= <id> ["=" <expr>]
 
-<statement> ::= <if> | <while> | <until> | <read> | <write> | <scope> | (<expr> ";")
+<statement> ::= <if> | <for> | <while> | <until> | <read> | <write> | <scope> | (<expr> ";")
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
+    <for> ::= "for" "(" <expr> ";" <expr> ";" <expr> ")" <statement>
     <while> ::= "while" "(" <expr> ")" <statement>
     <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
     <read> ::= "read" "(" <id> ")" ";"
