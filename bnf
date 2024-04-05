@@ -1,0 +1,34 @@
+<letter> ::= "a" | ... | "z" | "A" | ... | "Z"
+<digit> ::= "0" | ... | "9"
+<sign> ::= "+" | "-"
+<quot> ::= "\""
+
+<id> ::= <id_quant> {<id_quant>}
+    <id_quant> ::= <letter> | "_"
+
+<const> ::= <const_int> | <const_float> | <const_bool> | <const_str>
+    <const_int> ::= [<sign>] <digit> {<digit>}
+    <const_float> ::= [<sign>] <digit> {<digit>} "." <digit> {<digit>}
+    <const_bool> ::= "true" | "false"
+    <const_str> ::= <quot> {<str_quant>} <quot>
+        <str_quant> ::= any_ASCII_character_except_quot
+
+<expr> ::= (<id> | <const>) [<operator> (<id> | <const>)]
+    <operator> ::= <op_assign> | <op_arithm> | <op_cmp>
+        <op_assign> ::= "="
+        <op_arithm> ::= "+" | "-" | "*" | "/"
+        <op_cmp> ::= "==" | "!=" | ">" | ">=" | "<" | "<="
+
+<declaration> ::= <type> <var> {"," <var>} ";"
+    <type> ::= "int" | "float" | "bool" | "str"
+    <var> ::= <id> ["=" <expr>]
+
+<statement> ::= <if> | <while> | <until> | <read> | <write> | <scope> | (<expr> ";")
+    <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
+    <while> ::= "while" "(" <expr> ")" <statement>
+    <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
+    <read> ::= "read" "(" <id> ")" ";"
+    <write> ::= "write" "(" <expr> {"," <expr>} ")" ";"
+    <scope> ::= "{" {<statement>} "}"
+
+<program> ::= "program" "{" {<declaration> | <statement>} "}"
