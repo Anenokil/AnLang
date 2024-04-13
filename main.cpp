@@ -14,9 +14,15 @@ int main()
     std::ifstream ifs(ifn);
     if (ifs.is_open()) {
         /* recieve lexemes and print them */
-        bool is_ok = true; // whether there is one more lexeme
-        while (is_ok) {
-            std::cout << get_lex(ifs, is_ok) << std::endl;
+        ret_vals ret = RET_OK;
+        while (ret == RET_OK) {
+            std::cout << get_lex(ifs, ret) << std::endl;
+        }
+        /* check that reading ended normally */
+        if (ret == RET_ERR) {
+            std::cout << ">>> ERROR" << std::endl;
+        } else if (ret == RET_EOF) {
+            std::cout << ">>> EOF" << std::endl;
         }
     }
 }

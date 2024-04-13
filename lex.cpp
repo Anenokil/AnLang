@@ -92,27 +92,41 @@ bool has_correct_flag(char c, flag_vals & flag)
     return false; /* unknown flag */
 }
 
-std::string get_lex(std::ifstream & ifs, bool & ret)
+std::string get_lex(std::ifstream & ifs, ret_vals & ret)
 {
     static char c = ' ';
+
+    /* read space characters */
     while (!ifs.eof() && std::isspace(c)) {
         c = ifs.get();
     }
-
-    flag_vals flag = get_flag(c);
-    if (flag == ERROR) {
-        ret = false;
+    if (ifs.eof()) {
+        ret = RET_EOF;
         return "";
     }
 
+    /* read the first non-space character */
+    flag_vals flag = get_flag(c);
+    if (flag == ERROR) {
+        ret = RET_ERR;
+        return "";
+    }
+
+    /* read following characters */
     std::string res = "";
     do {
         res += c;
         c = ifs.get();
     } while (!ifs.eof() && has_correct_flag(c, flag));
     if (flag == ERROR) {
-        ret = false;
+        ret = RET_ERR;
         return "";
     }
+
+    /* return a result */
+    if (ifs.eof()) {
+        ret = RET_EOF;
+    }
+    ret = RET_OK;
     return res;
 }
