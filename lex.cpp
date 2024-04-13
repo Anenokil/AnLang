@@ -1,12 +1,15 @@
 #include <cstring> // strchr()
 #include "lex.h"
 
+const char ESCAPEBLE_SYMS[] = "\\nt\"";
 const char SPEC_SYMS[] = "+-*/%=<>!~(){};,";
 
 enum flag_vals {
     NAME,
     NUM,
     TEXT,
+    TEXT_ESCAPE,
+    TEXT_END,
     SPEC,
     ERROR,
 };
@@ -24,6 +27,11 @@ bool is_quot(char c)
 bool is_escape(char c)
 {
     return c == '\\';
+}
+
+bool is_escapeble(char c)
+{
+    return strchr(ESCAPEBLE_SYMS, c);
 }
 
 bool is_spec(char c)
@@ -56,14 +64,28 @@ flag_vals get_flag(char c)
     }
 }
 
-bool has_correct_flag(char c, char c_prev, flag_vals flag)
+bool has_correct_flag(char c, flag_vals & flag)
 {
     if (flag == NAME) {
         return is_name_quant(c);
     } else if (flag == NUM) {
         return is_num_quant(c);
     } else if (flag == TEXT) {
-        return !is_quot(c) || is_escape(c_prev);
+        if (is_escape(c)) {
+            flag = TEXT_ESCAPE;
+        } else if (is_quot(c)) {
+            flag = TEXT_END;
+        }
+        return true;
+    } else if (flag == TEXT_ESCAPE) {
+        if (is_escapeble(c)) {
+            flag = TEXT;
+            return true;
+        }
+        flag = ERROR;
+        return false;
+    } else if (flag == TEXT_END) {
+        return false;
     } else if (flag == SPEC) {
         return is_spec(c);
     }
@@ -72,10 +94,8 @@ bool has_correct_flag(char c, char c_prev, flag_vals flag)
 
 std::string get_lex(std::ifstream & ifs, bool & ret)
 {
-    static char c_prev = ' ';
     static char c = ' ';
     while (!ifs.eof() && std::isspace(c)) {
-        c_prev = c;
         c = ifs.get();
     }
 
@@ -88,13 +108,11 @@ std::string get_lex(std::ifstream & ifs, bool & ret)
     std::string res = "";
     do {
         res += c;
-        c_prev = c;
         c = ifs.get();
-    } while (!ifs.eof() && has_correct_flag(c, c_prev, flag));
-    if (!ifs.eof() && flag == TEXT) {
-        res += c;
-        c_prev = c;
-        c = ifs.get();
+    } while (!ifs.eof() && has_correct_flag(c, flag));
+    if (flag == ERROR) {
+        ret = false;
+        return "";
     }
     return res;
 }
