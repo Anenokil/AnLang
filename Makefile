@@ -1,17 +1,16 @@
 CC = g++
 CCFLAGS = -O0 -g
 MAIN = main
-MODUL = lex
-RES = r
+MODULS = lex synt
+TARGET = r
 
-all: $(RES)
+all: $(TARGET)
 
-$(MODUL).o: $(MODUL).cpp
-	$(CC) $(CCFLAGS) -c $(MODUL).cpp -o $(MODUL).o
-$(MAIN).o: $(MAIN).cpp
-	$(CC) $(CCFLAGS) -c $(MAIN).cpp -o $(MAIN).o
-$(RES): $(MAIN).o $(MODUL).o
-	$(CC) $(CCFLAGS) $(MODUL).o $(MAIN).o -o $(RES)
+doit:
+	$(foreach var, $(MODULS), $(CC) $(CCFLAGS) -c $(var).cpp -o $(var).o;)
+
+$(TARGET): $(MAIN).o $(foreach var, $(MODULS), $(var).o)
+	$(CC) $(CCFLAGS) $(foreach var, $(MODULS), $(var).o) $(MAIN).o -o $(TARGET)
 
 clear:
 	rm -rf *.o r
