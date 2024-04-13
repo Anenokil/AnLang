@@ -21,6 +21,11 @@ bool is_quot(char c)
     return c == '"';
 }
 
+bool is_escape(char c)
+{
+    return c == '\\';
+}
+
 bool is_spec(char c)
 {
     return strchr(SPEC_SYMS, c);
@@ -51,14 +56,14 @@ flag_vals get_flag(char c)
     }
 }
 
-bool has_correct_flag(char c, flag_vals flag)
+bool has_correct_flag(char c, char c_prev, flag_vals flag)
 {
     if (flag == NAME) {
         return is_name_quant(c);
     } else if (flag == NUM) {
         return is_num_quant(c);
     } else if (flag == TEXT) {
-        return !is_quot(c);
+        return !is_quot(c) || is_escape(c_prev);
     } else if (flag == SPEC) {
         return is_spec(c);
     }
@@ -67,8 +72,10 @@ bool has_correct_flag(char c, flag_vals flag)
 
 std::string get_lex(std::ifstream & ifs, bool & ret)
 {
+    static char c_prev = ' ';
     static char c = ' ';
-    while (std::isspace(c)) {
+    while (!ifs.eof() && std::isspace(c)) {
+        c_prev = c;
         c = ifs.get();
     }
 
@@ -81,7 +88,13 @@ std::string get_lex(std::ifstream & ifs, bool & ret)
     std::string res = "";
     do {
         res += c;
+        c_prev = c;
         c = ifs.get();
-    } while (has_correct_flag(c, flag));
+    } while (!ifs.eof() && has_correct_flag(c, c_prev, flag));
+    if (!ifs.eof() && flag == TEXT) {
+        res += c;
+        c_prev = c;
+        c = ifs.get();
+    }
     return res;
 }
