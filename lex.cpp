@@ -1,8 +1,9 @@
 #include <cstring> // strchr()
 #include "lex.h"
 
-const char ESCAPEBLE_SYMS[] = "\\nt\"";
-const char SPEC_SYMS[] = "+-*/%=<>!~(){};,";
+const char ESCAPEBLE_CHARS[] = "\\nt\""; // chars that may appear after the escape char
+const char SPEC_BEG_CHARS[] = "=!<>"; // chars that double special lexemes may start with
+const char SPEC_END_CHARS[] = "+-*/%=<>~(){};,"; // chars that may end special lexemes
 
 enum flag_vals {
     NAME,
@@ -11,6 +12,7 @@ enum flag_vals {
     TEXT_ESCAPE,
     TEXT_END,
     SPEC,
+    SPEC_END,
     ERROR,
 };
 
@@ -31,12 +33,17 @@ bool is_escape(char c)
 
 bool is_escapeble(char c)
 {
-    return strchr(ESCAPEBLE_SYMS, c);
+    return strchr(ESCAPEBLE_CHARS, c);
 }
 
-bool is_spec(char c)
+bool is_spec_beg(char c)
 {
-    return strchr(SPEC_SYMS, c);
+    return strchr(SPEC_BEG_CHARS, c);
+}
+
+bool is_spec_end(char c)
+{
+    return strchr(SPEC_END_CHARS, c);
 }
 
 bool is_num_quant(char c)
@@ -57,8 +64,10 @@ flag_vals get_flag(char c)
         return NUM;
     } else if (is_quot(c)) {
         return TEXT;
-    } else if (is_spec(c)) {
+    } else if (is_spec_beg(c)) {
         return SPEC;
+    } else if (is_spec_end(c)) {
+        return SPEC_END;
     } else {
         return ERROR;
     }
@@ -87,7 +96,10 @@ bool has_correct_flag(char c, flag_vals & flag)
     } else if (flag == TEXT_END) {
         return false;
     } else if (flag == SPEC) {
-        return is_spec(c);
+        flag = SPEC_END;
+        return is_spec_end(c);
+    } else if (flag == SPEC_END) {
+        return false;
     }
     return false; /* unknown flag */
 }
