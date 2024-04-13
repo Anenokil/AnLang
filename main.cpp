@@ -13,6 +13,7 @@ int main()
     /* open file */
     std::ifstream ifs(ifn);
     if (ifs.is_open()) {
+        /* create SyntTree and print it */
         SyntTree st(ifs);
         std::cout << st;
     }

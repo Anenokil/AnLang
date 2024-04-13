@@ -46,21 +46,21 @@ bool _is_spec_end(char c)
     return strchr(SPEC_END_CHARS, c);
 }
 
-bool is_num_quant(char c)
+bool _is_num_quant(char c)
 {
     return std::isdigit(c) || _is_point(c);
 }
 
-bool is_name_quant(char c)
+bool _is_name_quant(char c)
 {
     return std::isalpha(c) || c == '_';
 }
 
 flag_vals _get_flag(char c)
 {
-    if (is_name_quant(c)) {
+    if (_is_name_quant(c)) {
         return NAME;
-    } else if (is_num_quant(c)) {
+    } else if (_is_num_quant(c)) {
         return NUM;
     } else if (_is_quot(c)) {
         return TEXT;
@@ -76,9 +76,9 @@ flag_vals _get_flag(char c)
 bool _has_correct_flag(char c, flag_vals & flag)
 {
     if (flag == NAME) {
-        return is_name_quant(c);
+        return _is_name_quant(c);
     } else if (flag == NUM) {
-        return is_num_quant(c);
+        return _is_num_quant(c);
     } else if (flag == TEXT) {
         if (_is_escape(c)) {
             flag = TEXT_ESCAPE;
