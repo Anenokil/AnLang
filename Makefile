@@ -1,7 +1,7 @@
 CC = g++
 CCFLAGS = -O0 -g
 MAIN = main
-MODULES = lex synt
+MODULES = chtype lex synt
 TARGET = r
 
 all: $(TARGET)
