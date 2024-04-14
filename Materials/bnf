@@ -8,7 +8,7 @@
 
 <const> ::= <const_int> | <const_float> | <const_bool> | <const_str>
     <const_int> ::= [<sign>] <digit> {<digit>}
-    <const_float> ::= [<sign>] <digit> {<digit>} "." <digit> {<digit>}
+    <const_float> ::= [<sign>] {<digit>} "." {<digit>}
     <const_bool> ::= "true" | "false"
     <const_str> ::= <quot> {<str_quant>} <quot>
         <str_quant> ::= any_ASCII_character_except_quot
