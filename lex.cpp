@@ -130,7 +130,7 @@ bool _is_str_const(std::string const & lex)
     return lex.length() >= 2 && lex[0] == '"' && lex[lex.length() - 1] == '"';
 }
 
-lex_types define_type(std::string const & lex)
+lex_types define_lex_type(std::string const & lex)
 {
     if (lex == "") return LEX_UNKNOWN;
     if (lex == "program") return LEX_ROOT;

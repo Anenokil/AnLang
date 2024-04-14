@@ -38,6 +38,6 @@ enum lex_types {
 std::string get_lex(std::ifstream & ifs, ret_vals & ret);
 
 /* the function receives a lexeme and returns its type */
-lex_types define_type(std::string const & lex);
+lex_types define_lex_type(std::string const & lex);
 
 #endif
