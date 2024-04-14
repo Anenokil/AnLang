@@ -10,7 +10,7 @@ class SyntTree
 {
 private:
     lex_types type{};
-    std::string data{};
+    std::string lex{};
     SyntTree * successors{};
     unsigned suc_cnt{};
 
