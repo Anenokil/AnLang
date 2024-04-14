@@ -33,6 +33,7 @@
     <continue> ::= "continue" ";"
     <read> ::= "read" "(" <id> ")" ";"
     <write> ::= "write" "(" <expr> {"," <expr>} ")" ";"
-    <scope> ::= "{" {<statement>} "}"
 
-<program> ::= "program" "{" {<declaration> | <statement>} "}"
+<scope> ::= "{" {<declaration> | <statement>} "}"
+
+<program> ::= "program" <scope>
