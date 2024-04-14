@@ -26,7 +26,7 @@
 
 <statement> ::= <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write> | <scope> | (<expr> ";")
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
-    <for> ::= "for" "(" <expr> ";" <expr> ";" <expr> ")" <statement>
+    <for> ::= "for" "(" [<expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
     <while> ::= "while" "(" <expr> ")" <statement>
     <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
     <break> ::= "break" ";"
