@@ -2,59 +2,59 @@
 #include "chtype.h"
 
 enum flag_vals {
-    NAME,
-    NUM,
-    TEXT,
-    TEXT_ESCAPE,
-    TEXT_END,
-    SPEC,
-    SPEC_END,
-    ERROR,
+    FL_NAME,
+    FL_NUM,
+    FL_TEXT,
+    FL_TEXT_ESCAPE,
+    FL_TEXT_END,
+    FL_SPEC,
+    FL_SPEC_END,
+    FL_ERROR,
 };
 
 flag_vals _get_flag(char c)
 {
     if (is_name_quant(c)) {
-        return NAME;
+        return FL_NAME;
     } else if (is_num_quant(c)) {
-        return NUM;
+        return FL_NUM;
     } else if (is_quot(c)) {
-        return TEXT;
+        return FL_TEXT;
     } else if (is_spec_beg(c)) {
-        return SPEC;
+        return FL_SPEC;
     } else if (is_spec_end(c)) {
-        return SPEC_END;
+        return FL_SPEC_END;
     } else {
-        return ERROR;
+        return FL_ERROR;
     }
 }
 
 bool _has_correct_flag(char c, flag_vals & flag)
 {
-    if (flag == NAME) {
+    if (flag == FL_NAME) {
         return is_name_quant(c);
-    } else if (flag == NUM) {
+    } else if (flag == FL_NUM) {
         return is_num_quant(c);
-    } else if (flag == TEXT) {
+    } else if (flag == FL_TEXT) {
         if (is_escape(c)) {
-            flag = TEXT_ESCAPE;
+            flag = FL_TEXT_ESCAPE;
         } else if (is_quot(c)) {
-            flag = TEXT_END;
+            flag = FL_TEXT_END;
         }
         return true;
-    } else if (flag == TEXT_ESCAPE) {
+    } else if (flag == FL_TEXT_ESCAPE) {
         if (is_escapeble(c)) {
-            flag = TEXT;
+            flag = FL_TEXT;
             return true;
         }
-        flag = ERROR;
+        flag = FL_ERROR;
         return false;
-    } else if (flag == TEXT_END) {
+    } else if (flag == FL_TEXT_END) {
         return false;
-    } else if (flag == SPEC) {
-        flag = SPEC_END;
+    } else if (flag == FL_SPEC) {
+        flag = FL_SPEC_END;
         return is_spec_end(c);
-    } else if (flag == SPEC_END) {
+    } else if (flag == FL_SPEC_END) {
         return false;
     }
     return false; /* unknown flag */
@@ -75,7 +75,7 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret)
 
     /* read the first non-space character */
     flag_vals flag = _get_flag(c);
-    if (flag == ERROR) {
+    if (flag == FL_ERROR) {
         ret = RET_ERR;
         return "";
     }
@@ -86,7 +86,7 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret)
         res += c;
         c = ifs.get();
     } while (!ifs.eof() && _has_correct_flag(c, flag));
-    if (flag == ERROR) {
+    if (flag == FL_ERROR) {
         ret = RET_ERR;
         return "";
     }
