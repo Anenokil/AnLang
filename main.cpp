@@ -7,7 +7,7 @@ int main()
 {
     std::cout << "Testing program" << std::endl;
     std::cout << "Enter a filename: ";
-    /* recieve input file name */
+    /* receive input file name */
     std::string ifn;
     std::cin >> ifn;
     /* open file */
