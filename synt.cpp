@@ -1,5 +1,4 @@
 #include "synt.h"
-#include "lex.h"
 
 void SyntTree::del_suc()
 {
@@ -10,6 +9,7 @@ void SyntTree::del_suc()
 
 SyntTree & SyntTree::assign(SyntTree const & st)
 {
+    type = st.type;
     data = st.data;
     suc_cnt = st.suc_cnt;
     if (suc_cnt == 0) {
@@ -36,7 +36,7 @@ std::ostream & _print_tab(std::ostream & os, unsigned tab)
 std::ostream & SyntTree::print(std::ostream & os, unsigned tab) const
 {
     _print_tab(os, tab);
-    os << data << std::endl;
+    os << "[" << type << "] " << data << std::endl;
     if (suc_cnt != 0) {
         _print_tab(os, tab);
         os << "{" << std::endl;
@@ -71,7 +71,7 @@ void SyntTree::build(std::ifstream & ifs)
     }
 }
 
-SyntTree::SyntTree(std::string const & str): data(str), successors(nullptr), suc_cnt(0)
+SyntTree::SyntTree(std::string const & str): type(define_type(str)), data(str), successors(nullptr), suc_cnt(0)
 {}
 
 SyntTree::SyntTree(SyntTree const & st)
@@ -79,7 +79,7 @@ SyntTree::SyntTree(SyntTree const & st)
     assign(st);
 }
 
-SyntTree::SyntTree(std::ifstream & ifs): data(""), successors(nullptr), suc_cnt(0)
+SyntTree::SyntTree(std::ifstream & ifs): type(LEX_UNKNOWN), data(""), successors(nullptr), suc_cnt(0)
 {
     build(ifs);
 }
@@ -101,6 +101,7 @@ SyntTree & SyntTree::operator=(SyntTree const & st)
 
 SyntTree & SyntTree::operator=(std::string const & str)
 {
+    type = define_type(str);
     data = str;
     return *this;
 }

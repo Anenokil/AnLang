@@ -4,10 +4,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "lex.h"
 
 class SyntTree
 {
 private:
+    lex_types type{};
     std::string data{};
     SyntTree * successors{};
     unsigned suc_cnt{};
