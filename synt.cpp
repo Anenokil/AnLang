@@ -1,12 +1,13 @@
 #include "synt.h"
 
-void SyntTree::del_suc()
+void SyntTree::del_all_suc()
 {
     if (suc_cnt != 0) {
         delete[] successors;
     }
 }
 
+/* Не меняет predecessor, не удаляет successors */
 SyntTree & SyntTree::assign(SyntTree const & st)
 {
     type = st.type;
@@ -17,10 +18,56 @@ SyntTree & SyntTree::assign(SyntTree const & st)
     } else {
         successors = new SyntTree[suc_cnt];
         for (unsigned i = 0; i < suc_cnt; ++i) {
-            successors[i] = st.successors[i];
+            successors[i].assign(st.successors[i]);
+            successors[i].predecessor = this;
         }
     }
     return *this;
+}
+
+SyntTree * SyntTree::add_suc(node_types type, std::string lex)
+{
+    if (suc_cnt == 0) {
+        successors = new SyntTree[1];
+    } else {
+        SyntTree * tmp = new SyntTree[suc_cnt + 1];
+        for (unsigned i = 0; i < suc_cnt; ++i) {
+            tmp[i].assign(successors[i]);
+            tmp[i].predecessor = this;
+        }
+        del_all_suc();
+        successors = tmp;
+    }
+    successors[suc_cnt].type = type;
+    successors[suc_cnt].lex = lex;
+    successors[suc_cnt].predecessor = this;
+    ++suc_cnt;
+
+    return &(successors[suc_cnt - 1]);
+}
+
+SyntTree::SyntTree(node_types type, std::string lex, SyntTree * predecessor): type(type), lex(lex), predecessor(predecessor), successors(nullptr), suc_cnt(0)
+{}
+
+SyntTree::SyntTree(SyntTree const & st)
+{
+    assign(st);
+}
+
+SyntTree::~SyntTree()
+{
+    del_all_suc();
+}
+
+/* Не меняет predecessor */
+SyntTree & SyntTree::operator=(SyntTree const & st)
+{
+    if (this == &st) {
+        return *this;
+    }
+
+    del_all_suc();
+    return assign(st);
 }
 
 const char TAB[] = "   ";
@@ -38,89 +85,133 @@ std::ostream & SyntTree::print(std::ostream & os, unsigned tab) const
     _print_tab(os, tab);
     os << "[" << type << "] " << lex << std::endl;
     if (suc_cnt != 0) {
-        _print_tab(os, tab);
-        os << "{" << std::endl;
         for (unsigned i = 0; i < suc_cnt; ++i) {
             successors[i].print(os, tab + 1);
         }
-        _print_tab(os, tab);
-        os << "}" << std::endl;
     }
     return os;
-}
-
-void SyntTree::build(std::ifstream & ifs)
-{
-    if (ifs.is_open()) {
-        /* recieve lexemes */
-        ret_vals ret = RET_OK;
-        while (ret == RET_OK) {
-            std::string lex = get_lex(ifs, ret);
-            if (lex == "{") {
-                successors[suc_cnt - 1].build(ifs);
-            } else if (lex == "}") {
-                break;
-            } else {
-                *this += lex;
-            }
-        }
-        /* check that reading ended normally */
-        if (ret == RET_ERR) {
-            throw std::runtime_error("Invalid lexeme");
-        }
-    }
-}
-
-SyntTree::SyntTree(std::string const & str): type(define_type(str)), lex(str), successors(nullptr), suc_cnt(0)
-{}
-
-SyntTree::SyntTree(SyntTree const & st)
-{
-    assign(st);
-}
-
-SyntTree::SyntTree(std::ifstream & ifs): type(LEX_UNKNOWN), lex(""), successors(nullptr), suc_cnt(0)
-{
-    build(ifs);
-}
-
-SyntTree::~SyntTree()
-{
-    del_suc();
-}
-
-SyntTree & SyntTree::operator=(SyntTree const & st)
-{
-    if (this == &st) {
-        return *this;
-    }
-
-    del_suc();
-    return assign(st);
-}
-
-SyntTree & SyntTree::operator=(std::string const & str)
-{
-    type = define_type(str);
-    lex = str;
-    return *this;
-}
-
-SyntTree & SyntTree::operator+=(std::string const & str)
-{
-    SyntTree * tmp = new SyntTree[suc_cnt + 1];
-    for (unsigned i = 0; i < suc_cnt; ++i) {
-        tmp[i] = std::move(successors[i]);
-    }
-    tmp[suc_cnt] = str;
-
-    del_suc();
-    successors = tmp;
-    ++suc_cnt;
-    return *this;
 }
 
 std::ostream & operator<<(std::ostream & os, SyntTree const & st)
 {
     return st.print(os);
+}
+
+SyntTree build_synt_tree(std::ifstream & ifs)
+{
+    ret_vals ret = RET_OK;
+    std::string lex = get_lex(ifs, ret);
+    if (ret != RET_OK || define_lex_type(lex) != LEX_ROOT) {
+        throw std::runtime_error("Invalid lexeme: 'program' is expected");
+    }
+    SyntTree st(NODE_ROOT);
+    SyntTree * pst = &st;
+
+    while (lex = get_lex(ifs, ret), ret == RET_OK) {
+        lex_types lex_type = define_lex_type(lex);
+        if (lex_type == LEX_SCOPE_L) {
+            if (pst->type == NODE_ROOT || pst->type == NODE_SCOPE || pst->type == NODE_IF) {
+                pst = pst->add_suc(NODE_SCOPE);
+            } else {
+                // error
+            }
+        } else if (lex_type == LEX_SCOPE_R) {
+            while (pst->type != NODE_SCOPE) {
+                if (pst->type == NODE_ROOT) {
+                    // error
+                }
+                pst = pst->predecessor;
+            }
+            pst = pst->predecessor;
+        } else if (lex_type == LEX_TYPE) {
+            if (pst->type == NODE_SCOPE) {
+                pst = pst->add_suc(NODE_DECL, lex);
+            } else if (pst->type == NODE_FOR) {
+                // for (int x;;)
+            } else {
+                // error
+            }
+        } else if (lex_type == LEX_VAR) {
+            if (pst->type == NODE_DECL || pst->type == NODE_EXPR || pst->type == NODE_COND) {
+                pst = pst->add_suc(NODE_VAR, lex);
+                pst = pst->predecessor;
+            } else if (pst->type == NODE_SCOPE) {
+                pst = pst->add_suc(NODE_EXPR);
+                pst = pst->add_suc(NODE_VAR, lex);
+                pst = pst->predecessor;
+            } else {
+                // ...
+            }
+        } else if (lex_type == LEX_OPER_RET) {
+            if (pst->type == NODE_DECL || pst->type == NODE_EXPR || pst->type == NODE_COND) {
+                pst = pst->add_suc(NODE_EXPR);
+            } else {
+                // ...
+            }
+        } else if (lex_type == LEX_OPER_NORET) {
+            if (pst->type == NODE_EXPR || pst->type == NODE_COND) {
+                pst = pst->add_suc(NODE_OPER, lex);
+                pst = pst->predecessor;
+            } else {
+                // error
+            }
+        } else if (lex_type == LEX_COMMA) {
+            while (pst->type == NODE_EXPR) {
+                pst = pst->predecessor;
+            }
+            if (pst->type == NODE_DECL) {
+                std::string var_type = pst->lex;
+                pst = pst->predecessor;
+                pst = pst->add_suc(NODE_DECL, var_type);
+            } else {
+                // ...
+            }
+        } else if (lex_type == LEX_END) {
+            if (pst->type == NODE_FOR) {
+                // for (;;)
+            } else {
+                while (pst->type != NODE_SCOPE) {
+                    if (pst->type == NODE_ROOT) {
+                        // error
+                    }
+                    pst = pst->predecessor;
+                }
+            }
+        } else if (lex_type == LEX_CONST) {
+            if (pst->type == NODE_EXPR || pst->type == NODE_COND) {
+                pst = pst->add_suc(NODE_VAL, lex);
+                pst = pst->predecessor;
+            } else {
+                // ...
+            }
+        } else if (lex_type == LEX_IF) {
+            if (pst->type == NODE_SCOPE) {
+                pst = pst->add_suc(NODE_IF);
+            } else {
+                // error
+            }
+        } else if (lex_type == LEX_PARENTHESIS_L) {
+            if (pst->type == NODE_IF) {
+                pst = pst->add_suc(NODE_COND);
+            } else {
+                // ...
+            }
+        } else if (lex_type == LEX_PARENTHESIS_R) {
+            if (pst->type == NODE_COND || pst->type == NODE_EXPR) {
+                pst = pst->predecessor;
+            } else {
+                // ...
+            }
+        }
+    }
+    if (ret == RET_ERR) {
+        throw std::runtime_error("Invalid lexeme");
+    }
+
+    return st;
+}
+
+SyntTree::SyntTree(std::ifstream & ifs)
+{
+    *this = build_synt_tree(ifs);
 }
