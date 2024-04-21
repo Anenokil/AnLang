@@ -144,14 +144,14 @@ lex_types define_lex_type(std::string const & lex)
     if (lex == "while") return LEX_WHILE;
     if (lex == "do") return LEX_DO;
     if (lex == "until") return LEX_UNTIL;
+    if (lex == "break" || lex == "continue" || lex == "read" || lex == "write") return LEX_CMD;
+    if (lex == "true" || lex == "false" || _is_num_const(lex) || _is_str_const(lex)) return LEX_CONST;
     if (lex == "{") return LEX_SCOPE_L;
     if (lex == "}") return LEX_SCOPE_R;
     if (lex == "(") return LEX_PARENTHESIS_L;
     if (lex == ")") return LEX_PARENTHESIS_R;
-    if (lex == "break" || lex == "continue" || lex == "read" || lex == "write") return LEX_CMD;
-    if (_is_var_name(lex)) return LEX_VAR;
-    if (lex == "true" || lex == "false" || _is_num_const(lex) || _is_str_const(lex)) return LEX_CONST;
     if (lex == ",") return LEX_COMMA;
     if (lex == ";") return LEX_END;
+    if (_is_var_name(lex)) return LEX_VAR;
     return LEX_UNKNOWN;
 }
