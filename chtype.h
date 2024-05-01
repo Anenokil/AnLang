@@ -4,7 +4,7 @@
 bool is_point(char c);
 bool is_quot(char c);
 bool is_escape(char c);
-bool is_escapeble(char c);
+bool is_escapable(char c);
 bool is_spec_beg(char c);
 bool is_spec_end(char c);
 bool is_num_quant(char c);

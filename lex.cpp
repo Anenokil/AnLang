@@ -43,7 +43,7 @@ bool _has_correct_flag(char c, flag_vals & flag)
         }
         return true;
     } else if (flag == FL_TEXT_ESCAPE) {
-        if (is_escapeble(c)) {
+        if (is_escapable(c)) {
             flag = FL_TEXT;
             return true;
         }

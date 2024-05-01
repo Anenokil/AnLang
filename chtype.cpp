@@ -2,7 +2,7 @@
 #include <cstring> // strchr()
 #include <string> // isdigit(), isalpha()
 
-const char ESCAPEBLE_CHARS[] = "\\nt\""; // chars that may appear after the escape char
+const char ESCAPABLE_CHARS[] = "\\nt\""; // chars that may appear after the escape char
 const char SPEC_BEG_CHARS[] = "=!<>"; // chars that double special lexemes may start with
 const char SPEC_END_CHARS[] = "+-*/%=<>~(){};,"; // chars that may end special lexemes
 
@@ -21,9 +21,9 @@ bool is_escape(char c)
     return c == '\\';
 }
 
-bool is_escapeble(char c)
+bool is_escapable(char c)
 {
-    return strchr(ESCAPEBLE_CHARS, c);
+    return strchr(ESCAPABLE_CHARS, c);
 }
 
 bool is_spec_beg(char c)
