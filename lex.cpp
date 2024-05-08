@@ -1,4 +1,5 @@
 #include "lex.h"
+
 #include "chtype.h"
 
 enum flag_vals {

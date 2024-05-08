@@ -8,7 +8,7 @@
 #include "lex.h"
 
 enum node_types {
-    NODE_NULL, /* temporary type */
+    NODE_TMP, /* temporary type */
     NODE_ROOT,
     NODE_SCOPE,
     NODE_DECL,
@@ -40,17 +40,18 @@ private:
     SyntTree * successors{};
     unsigned suc_cnt{};
 
-    SyntTree * add_suc(node_types type = NODE_NULL, std::string lex = "");
+    SyntTree * add_suc(node_types type = NODE_TMP, std::string lex = "");
     void del_all_suc();
     SyntTree & assign(SyntTree const & st);
     std::ostream & print(std::ostream & os, unsigned tab = 0) const;
 
-public:
     SyntTree(node_types type = NODE_ROOT, std::string lex = "", SyntTree * predecessor = nullptr);
     SyntTree(SyntTree const & st);
+    SyntTree & operator=(SyntTree const & st);
+
+public:
     SyntTree(std::ifstream & ifs, TID & tid);
     ~SyntTree();
-    SyntTree & operator=(SyntTree const & st);
     friend std::ostream & operator<<(std::ostream & os, SyntTree const & st);
     friend SyntTree build_synt_tree(std::ifstream & ifs, TID & tid);
 };
