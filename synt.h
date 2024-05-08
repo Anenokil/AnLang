@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "tid.h"
 #include "lex.h"
 
 enum node_types {
@@ -47,11 +48,11 @@ private:
 public:
     SyntTree(node_types type = NODE_ROOT, std::string lex = "", SyntTree * predecessor = nullptr);
     SyntTree(SyntTree const & st);
-    SyntTree(std::ifstream & ifs);
+    SyntTree(std::ifstream & ifs, TID & tid);
     ~SyntTree();
     SyntTree & operator=(SyntTree const & st);
     friend std::ostream & operator<<(std::ostream & os, SyntTree const & st);
-    friend SyntTree build_synt_tree(std::ifstream & ifs);
+    friend SyntTree build_synt_tree(std::ifstream & ifs, TID & tid);
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "tid.h"
 #include "synt.h"
 
 int main()
@@ -13,8 +14,10 @@ int main()
     /* open file */
     std::ifstream ifs(ifn);
     if (ifs.is_open()) {
-        /* create SyntTree and print it */
-        SyntTree st(ifs);
+        /* form SyntTree and TID and print them */
+        TID tid;
+        SyntTree st(ifs, tid);
         std::cout << st;
+        tid.print();
     }
 }

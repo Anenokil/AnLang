@@ -97,7 +97,7 @@ std::ostream & operator<<(std::ostream & os, SyntTree const & st)
     return st.print(os);
 }
 
-SyntTree build_synt_tree(std::ifstream & ifs)
+SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
 {
     ret_vals ret = RET_OK;
     std::string lex = get_lex(ifs, ret);
@@ -134,6 +134,7 @@ SyntTree build_synt_tree(std::ifstream & ifs)
         } else if (lex_type == LEX_VAR) {
             if (pst->type == NODE_DECL || pst->type == NODE_EXPR || pst->type == NODE_COND) {
                 pst = pst->add_suc(NODE_VAR, lex);
+                tid.add(pst->predecessor->lex, pst->lex);
                 pst = pst->predecessor;
             } else if (pst->type == NODE_SCOPE) {
                 pst = pst->add_suc(NODE_EXPR);
@@ -211,7 +212,7 @@ SyntTree build_synt_tree(std::ifstream & ifs)
     return st;
 }
 
-SyntTree::SyntTree(std::ifstream & ifs)
+SyntTree::SyntTree(std::ifstream & ifs, TID & tid)
 {
-    *this = build_synt_tree(ifs);
+    *this = build_synt_tree(ifs, tid);
 }
