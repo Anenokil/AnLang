@@ -26,7 +26,7 @@
     <type> ::= "int" | "float" | "bool" | "str"
     <var> ::= <id> ["=" <expr>]
 
-<statement> ::= <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write> | <scope> | (<expr> ";")
+<statement> ::= <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write> | <declaration> | <scope> | (<expr> ";")
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
     <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
     <while> ::= "while" "(" <expr> ")" <statement>
@@ -36,6 +36,6 @@
     <read> ::= "read" "(" <id> ")" ";"
     <write> ::= "write" "(" <expr> {"," <expr>} ")" ";"
 
-<scope> ::= "{" {<declaration> | <statement>} "}"
+<scope> ::= "{" {<statement>} "}"
 
 <program> ::= "program" <scope>
