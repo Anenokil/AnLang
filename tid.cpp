@@ -3,14 +3,14 @@
 #include <iostream>
 #include <algorithm>
 
-TID::TID_Line::TID_Line(std::string const type, std::string const name, std::string const init)
+TID::TID_Line::TID_Line(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw)
 {
-    set_type(type);
-    set_name(name);
-    set_init(init);
+    set_type(type_raw);
+    set_name(name_raw);
+    set_init(init_raw);
 }
 
-void TID::TID_Line::set_type(std::string const type_raw)
+void TID::TID_Line::set_type(std::string const & type_raw)
 {
     if (type_raw == "int") {
         type_ = ID_TYPE_INT;
@@ -25,23 +25,14 @@ void TID::TID_Line::set_type(std::string const type_raw)
     }
 }
 
-void TID::TID_Line::set_name(std::string const name_raw)
+void TID::TID_Line::set_name(std::string const & name_raw)
 {
     name_ = name_raw; // Без перекрытия имён
 }
 
-void TID::TID_Line::set_init(std::string const init_raw)
+void TID::TID_Line::set_init(std::string const & init_raw)
 {
     init_ = init_raw;
-    /*if (type_ == ID_TYPE_INT) {
-        init_ = std::stoll(init_raw);
-    } else if (type_ == ID_TYPE_FLOAT) {
-        init_ = std::stold(init_raw);
-    } else if (type_ == ID_TYPE_BOOL) {
-        init_ = init_raw == "true" ? true : init_raw == "false" ? false : throw;
-    } else if (type_ == ID_TYPE_STR) {
-        init_ = init_raw;
-    }*/
 }
 
 id_types TID::TID_Line::get_type() const
@@ -74,7 +65,7 @@ void TID::TID_Line::print() const
     std::cout << type_ << " " << name_ << " {" << init_ << "}" << std::endl;
 }
 
-bool TID::add(std::string const type, std::string const name, std::string const init)
+bool TID::add(std::string const & type, std::string const & name, std::string const & init)
 {
     TID_Line new_line(type, name, init);
     if (std::find(lines_.begin(), lines_.end(), new_line) != lines_.end()) {
@@ -85,7 +76,7 @@ bool TID::add(std::string const type, std::string const name, std::string const 
     }
 }
 
-bool TID::set_init(std::string const name, std::string const init)
+bool TID::set_init(std::string const & name, std::string const & init)
 {
     TID_Line new_line("", name, "");
     auto it = std::find(lines_.begin(), lines_.end(), new_line);

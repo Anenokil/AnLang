@@ -12,7 +12,8 @@ enum id_types {
     ID_TYPE_STR,
 };
 
-class TID {
+class TID
+{
 private:
     class TID_Line
     {
@@ -22,10 +23,10 @@ private:
         std::string init_{};
 
     public:
-        TID_Line(std::string const type, std::string const name, std::string const init);
-        void set_type(std::string const type_raw);
-        void set_name(std::string const name_raw);
-        void set_init(std::string const init_raw);
+        TID_Line(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw);
+        void set_type(std::string const & type_raw);
+        void set_name(std::string const & name_raw);
+        void set_init(std::string const & init_raw);
         id_types get_type() const;
         std::string get_name() const;
         std::string get_init() const;
@@ -37,8 +38,8 @@ private:
     std::vector<TID_Line> lines_{};
 
 public:
-    bool add(std::string const type = "", std::string const name = "", std::string const init = "");
-    bool set_init(std::string const name, std::string const init);
+    bool add(std::string const & type = "", std::string const & name = "", std::string const & init = "");
+    bool set_init(std::string const & name, std::string const & init);
     void print() const;
 };
 
