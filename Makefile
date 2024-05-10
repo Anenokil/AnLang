@@ -1,7 +1,7 @@
 CC = g++
 CCFLAGS = -O0 -g
 MAIN = main
-MODULES = chtype tid lex synt
+MODULES = reserved chtype tid lex synt
 TARGET = r
 
 all: $(TARGET)

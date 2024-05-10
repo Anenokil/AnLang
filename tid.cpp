@@ -1,6 +1,7 @@
 #include "tid.h"
 
 #include <algorithm> // std::find()
+#include "reserved.h"
 
 TID::TID_Line::TID_Line(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw)
 {
@@ -11,13 +12,13 @@ TID::TID_Line::TID_Line(std::string const & type_raw, std::string const & name_r
 
 void TID::TID_Line::set_type(std::string const & type_raw)
 {
-    if (type_raw == "int") {
+    if (type_raw == rw::TYPE_INT) {
         type_ = ID_TYPE_INT;
-    } else if (type_raw == "float") {
+    } else if (type_raw == rw::TYPE_FLOAT) {
         type_ = ID_TYPE_FLOAT;
-    } else if (type_raw == "bool") {
+    } else if (type_raw == rw::TYPE_BOOL) {
         type_ = ID_TYPE_BOOL;
-    } else if (type_raw == "str") {
+    } else if (type_raw == rw::TYPE_STR) {
         type_ = ID_TYPE_STR;
     } else {
         type_ = ID_TYPE_UNKNOWN;
@@ -42,13 +43,13 @@ id_types TID::TID_Line::get_type() const
 std::string TID::TID_Line::get_typename() const
 {
     if (type_ == ID_TYPE_INT) {
-        return "int";
+        return rw::TYPE_INT;
     } else if (type_ == ID_TYPE_FLOAT) {
-        return "float";
+        return rw::TYPE_FLOAT;
     } else if (type_ == ID_TYPE_BOOL) {
-        return "bool";
+        return rw::TYPE_BOOL;
     } else if (type_ == ID_TYPE_STR) {
-        return "str";
+        return rw::TYPE_STR;
     } else {
         return "UNKNOWN_TYPE";
     }

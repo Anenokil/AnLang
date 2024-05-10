@@ -1,5 +1,7 @@
 #include "synt.h"
 
+#include "reserved.h"
+
 void SyntTree::del_all_suc()
 {
     if (suc_cnt != 0) {
@@ -102,7 +104,7 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
     ret_vals ret = RET_OK;
     std::string lex = get_lex(ifs, ret);
     if (ret != RET_OK || define_lex_type(lex) != LEX_ROOT) {
-        throw std::runtime_error("Invalid lexeme: 'program' is expected");
+        throw std::runtime_error("Invalid lexeme: '" + rw::BEGIN + "' is expected");
     }
     SyntTree st(NODE_ROOT);
     SyntTree * pst = &st;
