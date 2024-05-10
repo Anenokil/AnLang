@@ -82,10 +82,57 @@ std::ostream & _print_tab(std::ostream & os, unsigned tab)
     return os;
 }
 
+std::string SyntTree::get_typename() const
+{
+    if (type == NODE_ROOT) {
+        return "ROOT";
+    } else if (type == NODE_SCOPE) {
+        return "SCOP";
+    } else if (type == NODE_DECL) {
+        return "DECL";
+    } else if (type == NODE_OPER) {
+        return "OPER";
+    } else if (type == NODE_TYPE) {
+        return "TYPE";
+    } else if (type == NODE_VAR) {
+        return "VAR";
+    } else if (type == NODE_VAL) {
+        return "VAL";
+    } else if (type == NODE_EXPR) {
+        return "EXPR";
+    } else if (type == NODE_IF) {
+        return "IF";
+    } else if (type == NODE_COND) {
+        return "COND";
+    } else if (type == NODE_BODY_IF) {
+        return "BODY_IF";
+    } else if (type == NODE_BODY_ELSE) {
+        return "BODY_ELSE";
+    } else if (type == NODE_FOR) {
+        return "FOR";
+    } else if (type == NODE_FOR_INIT) {
+        return "FOR_INIT";
+    } else if (type == NODE_FOR_ITER) {
+        return "FOR_ITER";
+    } else if (type == NODE_BODY) {
+        return "BODY";
+    } else if (type == NODE_WHILE) {
+        return "WHIL";
+    } else if (type == NODE_DO) {
+        return "DO";
+    } else if (type == NODE_UNTIL) {
+        return "UNTIL";
+    } else if (type == NODE_CMD) {
+        return "CMD";
+    } else {
+        return "???";
+    }
+}
+
 std::ostream & SyntTree::print(std::ostream & os, unsigned tab) const
 {
     _print_tab(os, tab);
-    os << "[" << type << "] " << lex << std::endl;
+    os << "[" << get_typename() << "] " << lex << std::endl;
     if (suc_cnt != 0) {
         for (unsigned i = 0; i < suc_cnt; ++i) {
             successors[i].print(os, tab + 1);
