@@ -150,7 +150,7 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
 {
     ret_vals ret = RET_OK;
     std::string lex = get_lex(ifs, ret);
-    if (ret != RET_OK || define_lex_type(lex) != LEX_ROOT) {
+    if (ret != RET_OK || define_lex_type(lex) != LEX_BEGIN) {
         throw std::runtime_error("Invalid lexeme: '" + rw::BEGIN + "' is expected");
     }
     SyntTree st(NODE_ROOT);
@@ -192,20 +192,20 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
             } else {
                 // ...
             }
-        } else if (lex_type == LEX_OPER_RET) {
+        } else if (lex_type == LEX_OPER_2_RET) {
             if (pst->type == NODE_DECL || pst->type == NODE_EXPR || pst->type == NODE_COND) {
                 pst = pst->add_suc(NODE_EXPR);
             } else {
                 // ...
             }
-        } else if (lex_type == LEX_OPER_NORET) {
+        } else if (lex_type == LEX_OPER_2_NORET) {
             if (pst->type == NODE_EXPR || pst->type == NODE_COND) {
                 pst = pst->add_suc(NODE_OPER, lex);
                 pst = pst->predecessor;
             } else {
                 // error
             }
-        } else if (lex_type == LEX_COMMA) {
+        } else if (lex_type == LEX_OPER_COMMA) {
             while (pst->type == NODE_EXPR) {
                 pst = pst->predecessor;
             }
@@ -216,7 +216,7 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
             } else {
                 // ...
             }
-        } else if (lex_type == LEX_END) {
+        } else if (lex_type == LEX_OPER_END) {
             if (pst->type == NODE_FOR) {
                 // for (;;)
             } else {

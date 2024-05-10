@@ -11,10 +11,17 @@ enum ret_vals {
 };
 
 enum lex_types {
-    LEX_ROOT,
-    LEX_OPER_NORET,
-    LEX_OPER_RET,
+    LEX_UNKNOWN,
+    LEX_BEGIN,
     LEX_TYPE,
+    LEX_VAR,
+    LEX_CONST,
+    LEX_OPER_COMMA,
+    LEX_OPER_END,
+    LEX_OPER_0,
+    LEX_OPER_1,
+    LEX_OPER_2_NORET,
+    LEX_OPER_2_RET,
     LEX_IF,
     LEX_ELSE,
     LEX_FOR,
@@ -25,12 +32,6 @@ enum lex_types {
     LEX_SCOPE_R,
     LEX_PARENTHESIS_L,
     LEX_PARENTHESIS_R,
-    LEX_CMD,
-    LEX_VAR,
-    LEX_CONST,
-    LEX_COMMA,
-    LEX_END,
-    LEX_UNKNOWN,
 };
 
 /* the function gets one lexeme from file and returns it;

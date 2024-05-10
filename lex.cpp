@@ -135,26 +135,27 @@ bool _is_str_const(std::string const & lex)
 lex_types define_lex_type(std::string const & lex)
 {
     if (lex == "") return LEX_UNKNOWN;
-    if (lex == rw::BEGIN) return LEX_ROOT;
+    if (lex == rw::BEGIN) return LEX_BEGIN;
+    if (lex == rw::OPER_COMMA) return LEX_OPER_COMMA;
+    if (lex == rw::OPER_END) return LEX_OPER_END;
+    if (lex == rw::OPER_BREAK || lex == rw::OPER_CONT) return LEX_OPER_0;
+    if (lex == rw::OPER_SCAN || lex == rw::OPER_PRINT) return LEX_OPER_1;
     if (lex == rw::OPER_ADD || lex == rw::OPER_SUB || lex == rw::OPER_MULT || lex == rw::OPER_DIV || lex == rw::OPER_REM ||
         lex == rw::OPER_AND || lex == rw::OPER_OR || lex == rw::OPER_NOT ||
-        lex == rw::OPER_EQ || lex == rw::OPER_NE || lex == rw::OPER_L || lex == rw::OPER_LE || lex == rw::OPER_G || lex == rw::OPER_GE) return LEX_OPER_NORET;
-    if (lex == rw::OPER_ASSIGN) return LEX_OPER_RET;
-    if (lex == rw::TYPE_INT || lex == rw::TYPE_FLOAT || lex == rw::TYPE_BOOL || lex == rw::TYPE_STR) return LEX_TYPE;
+        lex == rw::OPER_EQ || lex == rw::OPER_NE || lex == rw::OPER_L || lex == rw::OPER_LE || lex == rw::OPER_G || lex == rw::OPER_GE) return LEX_OPER_2_NORET;
+    if (lex == rw::OPER_ASSIGN) return LEX_OPER_2_RET;
     if (lex == rw::OPER_IF) return LEX_IF;
     if (lex == rw::OPER_ELSE) return LEX_ELSE;
     if (lex == rw::OPER_FOR) return LEX_FOR;
     if (lex == rw::OPER_WHILE) return LEX_WHILE;
     if (lex == rw::OPER_DO) return LEX_DO;
     if (lex == rw::OPER_UNTIL) return LEX_UNTIL;
-    if (lex == rw::OPER_BREAK || lex == rw::OPER_CONT || lex == rw::OPER_SCAN || lex == rw::OPER_PRINT) return LEX_CMD;
-    if (lex == rw::BOOL_TRUE || lex == rw::BOOL_FALSE || _is_num_const(lex) || _is_str_const(lex)) return LEX_CONST;
     if (lex == rw::SCOPE_BEG) return LEX_SCOPE_L;
     if (lex == rw::SCOPE_END) return LEX_SCOPE_R;
     if (lex == rw::PAR_BEG) return LEX_PARENTHESIS_L;
     if (lex == rw::PAR_END) return LEX_PARENTHESIS_R;
-    if (lex == rw::OPER_COMMA) return LEX_COMMA;
-    if (lex == rw::OPER_END) return LEX_END;
+    if (lex == rw::TYPE_INT || lex == rw::TYPE_FLOAT || lex == rw::TYPE_BOOL || lex == rw::TYPE_STR) return LEX_TYPE;
+    if (lex == rw::BOOL_TRUE || lex == rw::BOOL_FALSE || _is_num_const(lex) || _is_str_const(lex)) return LEX_CONST;
     if (_is_var_name(lex)) return LEX_VAR;
     return LEX_UNKNOWN;
 }
