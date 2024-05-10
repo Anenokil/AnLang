@@ -1,7 +1,6 @@
 #include "tid.h"
 
-#include <iostream>
-#include <algorithm>
+#include <algorithm> // std::find()
 
 TID::TID_Line::TID_Line(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw)
 {
@@ -40,6 +39,21 @@ id_types TID::TID_Line::get_type() const
     return type_;
 }
 
+std::string TID::TID_Line::get_typename() const
+{
+    if (type_ == ID_TYPE_INT) {
+        return "int";
+    } else if (type_ == ID_TYPE_FLOAT) {
+        return "float";
+    } else if (type_ == ID_TYPE_BOOL) {
+        return "bool";
+    } else if (type_ == ID_TYPE_STR) {
+        return "str";
+    } else {
+        return "UNKNOWN_TYPE";
+    }
+}
+
 std::string TID::TID_Line::get_name() const
 {
     return name_;
@@ -60,9 +74,10 @@ bool TID::TID_Line::operator!=(TID_Line const & other) const
     return !(*this == other);
 }
 
-void TID::TID_Line::print() const
+std::ostream & TID::TID_Line::print(std::ostream & os) const
 {
-    std::cout << type_ << " " << name_ << " {" << init_ << "}" << std::endl;
+    os << get_typename() << " " << name_ << " {" << init_ << "}";
+    return os;
 }
 
 bool TID::add(std::string const & type, std::string const & name, std::string const & init)
@@ -88,9 +103,10 @@ bool TID::set_init(std::string const & name, std::string const & init)
     }
 }
 
-void TID::print() const
+std::ostream & operator<<(std::ostream & os, TID const & obj)
 {
-    for (auto const & elem: lines_) {
-        elem.print();
+    for (auto const & line: obj.lines_) {
+        line.print(os) << std::endl;
     }
+    return os;
 }

@@ -1,6 +1,7 @@
 #ifndef TID_H
 #define TID_H
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -28,11 +29,12 @@ private:
         void set_name(std::string const & name_raw);
         void set_init(std::string const & init_raw);
         id_types get_type() const;
+        std::string get_typename() const;
         std::string get_name() const;
         std::string get_init() const;
         bool operator==(TID_Line const & other) const;
         bool operator!=(TID_Line const & other) const;
-        void print() const;
+        std::ostream & print(std::ostream & os) const;
     };
 
     std::vector<TID_Line> lines_{};
@@ -40,7 +42,7 @@ private:
 public:
     bool add(std::string const & type = "", std::string const & name = "", std::string const & init = "");
     bool set_init(std::string const & name, std::string const & init);
-    void print() const;
+    friend std::ostream & operator<<(std::ostream & os, TID const & obj);
 };
 
 #endif

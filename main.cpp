@@ -18,6 +18,6 @@ int main()
         TID tid;
         SyntTree st(ifs, tid);
         std::cout << st;
-        tid.print();
+        std::cout << tid;
     }
 }
