@@ -1,5 +1,5 @@
-#ifndef RESERVED_WORDS_H
-#define RESERVED_WORDS_H
+#ifndef RESERVED_H
+#define RESERVED_H
 
 #include <string>
 
