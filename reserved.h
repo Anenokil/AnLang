@@ -23,8 +23,8 @@ namespace rw
     std::string const OPER_UNTIL = "until";
     std::string const OPER_BREAK = "break";
     std::string const OPER_CONT = "continue";
-    std::string const OPER_SCAN = "read";
-    std::string const OPER_PRINT = "write";
+    std::string const OPER_READ = "read";
+    std::string const OPER_WRITE = "write";
 
     std::string const OPER_ADD = "+";
     std::string const OPER_SUB = "-";
