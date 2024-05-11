@@ -9,26 +9,30 @@
 
 enum node_types {
     NODE_TMP,
-    NODE_ROOT,
+    NODE_BEGIN,
     NODE_SCOPE,
+    NODE_BREAK,
+    NODE_CONT,
+    NODE_READ,
+    NODE_WRITE,
     NODE_DECL,
-    NODE_OPER,
+    NODE_OPER_LOOP,
+    NODE_OPER_IN,
+    NODE_OPER_OUT,
+    NODE_OPER_2,
+    NODE_OPERAND,
+    NODE_ASSIGN,
     NODE_TYPE,
     NODE_VAR,
-    NODE_VAL,
+    NODE_VAR_INIT,
     NODE_EXPR,
     NODE_IF,
-    NODE_COND,
-    NODE_BODY_IF,
-    NODE_BODY_ELSE,
     NODE_FOR,
+    NODE_WHILE,
+    NODE_UNTIL,
+    NODE_COND,
     NODE_FOR_INIT,
     NODE_FOR_ITER,
-    NODE_BODY,
-    NODE_WHILE,
-    NODE_DO,
-    NODE_UNTIL,
-    NODE_CMD,
 };
 
 class SyntTree
@@ -46,7 +50,7 @@ private:
     std::string get_typename() const;
     std::ostream & print(std::ostream & os, unsigned tab = 0) const;
 
-    SyntTree(node_types type = NODE_ROOT, std::string lex = "", SyntTree * predecessor = nullptr);
+    SyntTree(node_types type = NODE_BEGIN, std::string lex = "", SyntTree * predecessor = nullptr);
     SyntTree(SyntTree const & st);
     SyntTree & operator=(SyntTree const & st);
 
