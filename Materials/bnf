@@ -27,10 +27,10 @@
     <var> ::= <id> ["=" <expr>]
 
 <statement> ::= <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write> | <declaration> | <scope> | (<expr> ";")
-    <if> ::= "if" <expr> <statement> ["else" <statement>]
+    <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
     <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
-    <while> ::= "while" <expr> <statement>
-    <until> ::= "do" <statement> "until" <expr> ";"
+    <while> ::= "while" "(" <expr> ")" <statement>
+    <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
     <break> ::= "break" ";"
     <continue> ::= "continue" ";"
     <read> ::= "read" <id> ";"
