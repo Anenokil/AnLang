@@ -138,8 +138,9 @@ lex_types define_lex_type(std::string const & lex)
     if (lex == rw::BEGIN) return LEX_BEGIN;
     if (lex == rw::OPER_COMMA) return LEX_OPER_COMMA;
     if (lex == rw::OPER_END) return LEX_OPER_END;
-    if (lex == rw::OPER_BREAK || lex == rw::OPER_CONT) return LEX_OPER_0;
-    if (lex == rw::OPER_READ || lex == rw::OPER_WRITE) return LEX_OPER_1;
+    if (lex == rw::OPER_BREAK || lex == rw::OPER_CONT) return LEX_OPER_LOOP;
+    if (lex == rw::OPER_READ) return LEX_OPER_IN;
+    if (lex == rw::OPER_WRITE) return LEX_OPER_OUT;
     if (lex == rw::OPER_ADD || lex == rw::OPER_SUB || lex == rw::OPER_MULT || lex == rw::OPER_DIV || lex == rw::OPER_REM ||
         lex == rw::OPER_AND || lex == rw::OPER_OR || lex == rw::OPER_NOT ||
         lex == rw::OPER_EQ || lex == rw::OPER_NE || lex == rw::OPER_L || lex == rw::OPER_LE || lex == rw::OPER_G || lex == rw::OPER_GE) return LEX_OPER_2_NORET;
