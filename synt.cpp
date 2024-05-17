@@ -153,14 +153,14 @@ void err(std::string const & exp, std::string const & got)
     throw std::runtime_error(ERRMSG(exp, got));
 }
 
-void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst)
+void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_depth, int & loop_depth)
 {
-    unsigned scope_depth = 0;
-    unsigned loop_depth = 0;
-
-    std::string lex;
     ret_vals ret = RET_OK;
-    while (lex = get_lex(ifs, ret), ret == RET_OK) {
+    std::string lex = get_lex(ifs, ret);
+    if (ret == RET_ERR) {
+        throw std::runtime_error("Invalid lexeme");
+    }
+    if (ret == RET_OK) {
         lex_types lex_type = define_lex_type(lex);
         if (pst->type == NODE_BEGIN) {
             if (lex_type == LEX_SCOPE_L) {
@@ -292,9 +292,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst)
         } else if (pst->type == NODE_OPER_OUT) {
             /**/
         }
-    }
-    if (ret == RET_ERR) {
-        throw std::runtime_error("Invalid lexeme");
+        create_node(ifs, tid, pst, scope_depth, loop_depth);
     }
 }
 
@@ -308,7 +306,9 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
     SyntTree st(NODE_BEGIN);
     SyntTree * pst = &st;
 
-    create_node(ifs, tid, pst);
+    int scope_depth = 0;
+    int loop_depth = 0;
+    create_node(ifs, tid, pst, scope_depth, loop_depth);
 
     return st;
 }
