@@ -146,20 +146,20 @@ std::ostream & operator<<(std::ostream & os, SyntTree const & st)
     return st.print(os);
 }
 
-#define ERRMSG(EXP, GOT) "Invalid lexeme: '" + EXP + "' is expected but got '" + GOT + "'."
-
-void err(std::string const & exp, std::string const & got)
+void _err(std::string const & exp, std::string const & got)
 {
-    throw std::runtime_error(ERRMSG(exp, got));
+    throw std::runtime_error("Invalid lexeme: '" + exp + "' is expected but got '" + got + "'.");
+}
+
+void _err(std::string const & got)
+{
+    throw std::runtime_error("Invalid lexeme: '" + got + "'.");
 }
 
 void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_depth, int & loop_depth)
 {
     ret_vals ret = RET_OK;
     std::string lex = get_lex(ifs, ret);
-    if (ret == RET_ERR) {
-        throw std::runtime_error("Invalid lexeme");
-    }
     if (ret == RET_OK) {
         lex_types lex_type = define_lex_type(lex);
         if (pst->type == NODE_BEGIN) {
@@ -167,7 +167,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
                 ++scope_depth;
                 pst = pst->add_suc(NODE_SCOPE);
             } else {
-                // error
+                _err(lex);
             }
         } else if (pst->type == NODE_SCOPE) {
             if (lex_type == LEX_SCOPE_L) {
@@ -200,13 +200,13 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
                 /**/pst = pst->add_suc(NODE_EXPR);
                 pst = pst->add_suc(NODE_EXPR);
             } else {
-                // error
+                _err(lex);
             }
         } else if (pst->type == NODE_DECL) {
             if (lex_type == LEX_VAR) {
                 pst = pst->add_suc(NODE_VAR, lex);
             } else {
-                // error
+                _err(lex);
             }
         } else if (pst->type == NODE_VAR) {
             if (lex_type == LEX_OPER_2_RET) {
@@ -219,7 +219,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
                 pst = pst->predecessor;
                 pst = pst->predecessor;
             } else {
-                // error
+                _err(lex);
             }
         } else if (pst->type == NODE_VAR_INIT) {
             if (lex_type == LEX_CONST || lex_type == LEX_VAR) {
@@ -240,7 +240,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
                 pst = pst->predecessor;
                 pst = pst->predecessor;
             } else {
-                // error
+                _err(lex);
             }
         } else if (pst->type == NODE_EXPR) {
             if (lex_type == LEX_CONST || lex_type == LEX_VAR) {
@@ -285,7 +285,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
             if (lex_type == LEX_OPER_END) {
                 pst = pst->predecessor;
             } else {
-                // error
+                _err(lex);
             }
         } else if (pst->type == NODE_OPER_IN) {
             /**/
@@ -301,7 +301,7 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
     ret_vals ret = RET_OK;
     std::string lex = get_lex(ifs, ret);
     if (ret != RET_OK || define_lex_type(lex) != LEX_BEGIN) {
-        err(rw::BEGIN, lex);
+        _err(rw::BEGIN, lex);
     }
     SyntTree st(NODE_BEGIN);
     SyntTree * pst = &st;
