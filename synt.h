@@ -31,7 +31,9 @@ enum node_types {
     NODE_WHILE,
     NODE_UNTIL,
     NODE_COND,
+    NODE_BODY,
     NODE_FOR_INIT,
+    NODE_FOR_COND,
     NODE_FOR_ITER,
 };
 

@@ -114,10 +114,14 @@ std::string SyntTree::get_typename() const
         return "IF";
     } else if (type == NODE_COND) {
         return "COND";
+    } else if (type == NODE_BODY) {
+        return "BODY";
     } else if (type == NODE_FOR) {
         return "FOR";
     } else if (type == NODE_FOR_INIT) {
         return "FOR_INIT";
+    } else if (type == NODE_FOR_COND) {
+        return "FOR_COND";
     } else if (type == NODE_FOR_ITER) {
         return "FOR_ITER";
     } else if (type == NODE_WHILE) {
@@ -279,11 +283,23 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
                 }
             }
         } else if (pst->type == NODE_IF) {
-            /**/
+            if (lex_type == LEX_PARENTHESIS_L) {
+                pst = pst->add_suc(NODE_COND);
+            } else {
+                // error
+            }
         } else if (pst->type == NODE_FOR) {
-            /**/
+            if (lex_type == LEX_PARENTHESIS_L) {
+                pst = pst->add_suc(NODE_FOR_INIT);
+            } else {
+                // error
+            }
         } else if (pst->type == NODE_WHILE) {
-            /**/
+            if (lex_type == LEX_PARENTHESIS_L) {
+                pst = pst->add_suc(NODE_COND);
+            } else {
+                // error
+            }
         } else if (pst->type == NODE_UNTIL) {
             /**/
         } else if (pst->type == NODE_OPER_LOOP) {
@@ -295,6 +311,29 @@ SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
         } else if (pst->type == NODE_OPER_IN) {
             /**/
         } else if (pst->type == NODE_OPER_OUT) {
+            /**/
+        } else if (pst->type == NODE_COND) {
+            if (lex_type == LEX_CONST || lex_type == LEX_VAR) {
+                /*?*/pst = pst->add_suc(NODE_OPERAND, lex);
+                pst = pst->predecessor;
+            } else if (lex_type == LEX_OPER_2_RET || lex_type == LEX_OPER_2_NORET) {
+                /*?*/pst = pst->add_suc(NODE_OPER_2, lex);
+                pst = pst->predecessor;
+            } else if (lex_type == LEX_PARENTHESIS_L) {
+                /*?*/pst = pst->add_suc(NODE_EXPR);
+            } else if (lex_type == LEX_PARENTHESIS_R) {
+                pst = pst->predecessor;
+                pst = pst->add_suc(NODE_BODY);
+            } else {
+                // error
+            }
+        } else if (pst->type == NODE_BODY) {
+            /**/
+        } else if (pst->type == NODE_FOR_INIT) {
+            /**/
+        } else if (pst->type == NODE_FOR_COND) {
+            /**/
+        } else if (pst->type == NODE_FOR_ITER) {
             /**/
         }
     }
