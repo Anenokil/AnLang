@@ -36,8 +36,9 @@ enum lex_types {
 };
 
 /* the function gets one lexeme from file and returns it;
- * sets 'ret' value */
-std::string get_lex(std::ifstream & ifs, ret_vals & ret);
+ * sets 'ret' value;
+ * if to_throw sets on true, throws an error instead of RET_ERR returns */
+std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw = true);
 
 /* the function receives a lexeme and returns its type */
 lex_types define_lex_type(std::string const & lex);

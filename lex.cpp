@@ -62,7 +62,7 @@ bool _has_correct_flag(char c, flag_vals & flag)
     return false; /* unknown flag */
 }
 
-std::string get_lex(std::ifstream & ifs, ret_vals & ret)
+std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw)
 {
     static char c = ' ';
 
@@ -79,6 +79,9 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret)
     flag_vals flag = _get_flag(c);
     if (flag == FL_ERROR) {
         ret = RET_ERR;
+        if (to_throw) {
+            throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
+        }
         return "";
     }
 
@@ -90,6 +93,9 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret)
     } while (!ifs.eof() && _has_correct_flag(c, flag));
     if (flag == FL_ERROR) {
         ret = RET_ERR;
+        if (to_throw) {
+            throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
+        }
         return "";
     }
 
