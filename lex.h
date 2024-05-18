@@ -4,13 +4,13 @@
 #include <fstream>
 #include <string>
 
-enum ret_vals {
+enum RetVal {
     RET_OK,
     RET_ERR,
     RET_EOF,
 };
 
-enum lex_types {
+enum LexType {
     LEX_UNKNOWN,
     LEX_BEGIN,
     LEX_TYPE,
@@ -35,12 +35,24 @@ enum lex_types {
     LEX_PARENTHESIS_R,
 };
 
-/* the function gets one lexeme from file and returns it;
- * sets 'ret' value;
- * if to_throw sets on true, throws an error instead of RET_ERR returns */
-std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw = true);
+class Lex
+{
+private:
+    std::string word_{};
+    LexType type_{};
 
-/* the function receives a lexeme and returns its type */
-lex_types define_lex_type(std::string const & lex);
+    /* the function receives a lexeme and returns its type */
+    LexType define_lex_type(std::string const & lex);
+    
+public:
+    explicit Lex(std::string const & str);
+    std::string word() const;
+    LexType type() const;
+};
+
+/* the function gets one lexeme from file and returns it;
+* sets 'ret' value;
+* if to_throw sets on true, throws an error instead of RET_ERR returns */
+Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw = true);
 
 #endif

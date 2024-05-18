@@ -3,7 +3,7 @@
 #include "reserved.h"
 #include "chtype.h"
 
-enum flag_vals {
+enum FlagVal {
     FL_NAME,
     FL_NUM,
     FL_TEXT,
@@ -14,7 +14,7 @@ enum flag_vals {
     FL_ERROR,
 };
 
-flag_vals _get_flag(char c)
+FlagVal _get_flag(char c)
 {
     if (is_name_quant(c)) {
         return FL_NAME;
@@ -31,7 +31,7 @@ flag_vals _get_flag(char c)
     }
 }
 
-bool _has_correct_flag(char c, flag_vals & flag)
+bool _has_correct_flag(char c, FlagVal & flag)
 {
     if (flag == FL_NAME) {
         return is_name_quant(c);
@@ -62,7 +62,7 @@ bool _has_correct_flag(char c, flag_vals & flag)
     return false; /* unknown flag */
 }
 
-std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw)
+Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
 {
     static char c = ' ';
 
@@ -72,17 +72,17 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw)
     }
     if (ifs.eof()) {
         ret = RET_EOF;
-        return "";
+        return Lex("");
     }
 
     /* read the first non-space character */
-    flag_vals flag = _get_flag(c);
+    FlagVal flag = _get_flag(c);
     if (flag == FL_ERROR) {
         ret = RET_ERR;
         if (to_throw) {
             throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
         }
-        return "";
+        return Lex("");
     }
 
     /* read following characters */
@@ -96,7 +96,7 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw)
         if (to_throw) {
             throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
         }
-        return "";
+        return Lex("");
     }
 
     /* return a result */
@@ -104,7 +104,7 @@ std::string get_lex(std::ifstream & ifs, ret_vals & ret, bool to_throw)
         ret = RET_EOF;
     }
     ret = RET_OK;
-    return res;
+    return Lex(res);
 }
 
 bool _is_var_name(std::string const & lex)
@@ -138,7 +138,7 @@ bool _is_str_const(std::string const & lex)
     return lex.length() >= 2 && lex[0] == '"' && lex[lex.length() - 1] == '"';
 }
 
-lex_types define_lex_type(std::string const & lex)
+LexType Lex::define_lex_type(std::string const & lex)
 {
     if (lex == "") return LEX_UNKNOWN;
     if (lex == rw::BEGIN) return LEX_BEGIN;
@@ -165,4 +165,17 @@ lex_types define_lex_type(std::string const & lex)
     if (lex == rw::BOOL_TRUE || lex == rw::BOOL_FALSE || _is_num_const(lex) || _is_str_const(lex)) return LEX_CONST;
     if (_is_var_name(lex)) return LEX_VAR;
     return LEX_UNKNOWN;
+}
+
+Lex::Lex(std::string const & str): word_(str), type_(define_lex_type(str))
+{}
+
+std::string Lex::word() const
+{
+    return word_;
+}
+
+LexType Lex::type() const
+{
+    return type_;
 }

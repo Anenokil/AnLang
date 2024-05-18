@@ -158,102 +158,103 @@ void _err(std::string const & got)
 
 void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_depth, int & loop_depth)
 {
-    ret_vals ret = RET_OK;
-    std::string lex = get_lex(ifs, ret);
+    // if scope_depth == 0 _err;
+    RetVal ret = RET_OK;
+    Lex lex = get_lex(ifs, ret);
     if (ret == RET_OK) {
-        lex_types lex_type = define_lex_type(lex);
         if (pst->type == NODE_BEGIN) {
-            if (lex_type == LEX_SCOPE_L) {
+            if (lex.type() == LEX_SCOPE_L) {
                 ++scope_depth;
                 pst = pst->add_suc(NODE_SCOPE);
             } else {
-                _err(lex);
+                _err(lex.word());
             }
         } else if (pst->type == NODE_SCOPE) {
-            if (lex_type == LEX_SCOPE_L) {
+            if (lex.type() == LEX_SCOPE_L) {
                 ++scope_depth;
                 pst = pst->add_suc(NODE_SCOPE);
-            } else if (lex_type == LEX_SCOPE_R) {
+            } else if (lex.type() == LEX_SCOPE_R) {
                 --scope_depth;
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_TYPE) {
-                pst = pst->add_suc(NODE_DECL, lex);
-            } else if (lex_type == LEX_IF) {
+            } else if (lex.type() == LEX_TYPE) {
+                pst = pst->add_suc(NODE_DECL, lex.word());
+            } else if (lex.type() == LEX_IF) {
                 /**/pst = pst->add_suc(NODE_IF);
-            } else if (lex_type == LEX_FOR) {
+                
+            } else if (lex.type() == LEX_FOR) {
                 /**/pst = pst->add_suc(NODE_FOR);
-            } else if (lex_type == LEX_WHILE) {
+            } else if (lex.type() == LEX_WHILE) {
                 /**/pst = pst->add_suc(NODE_WHILE);
-            } else if (lex_type == LEX_DO) {
+            } else if (lex.type() == LEX_DO) {
                 /**/pst = pst->add_suc(NODE_UNTIL);
-            } else if (lex_type == LEX_OPER_LOOP) {
-                /**/pst = pst->add_suc(NODE_OPER_LOOP, lex);
-            } else if (lex_type == LEX_OPER_IN) {
+            } else if (lex.type() == LEX_OPER_LOOP) {
+                /**/pst = pst->add_suc(NODE_OPER_LOOP, lex.word());
+            } else if (lex.type() == LEX_OPER_IN) {
                 /**/pst = pst->add_suc(NODE_OPER_IN);
-            } else if (lex_type == LEX_OPER_OUT) {
+            } else if (lex.type() == LEX_OPER_OUT) {
                 /**/pst = pst->add_suc(NODE_OPER_OUT);
-            } else if (lex_type == LEX_CONST || lex_type == LEX_VAR) {
+            } else if (lex.type() == LEX_CONST || lex.type() == LEX_VAR) {
                 /**/pst = pst->add_suc(NODE_EXPR);
-                pst = pst->add_suc(NODE_OPERAND, lex);
+                pst = pst->add_suc(NODE_OPERAND, lex.word());
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_PARENTHESIS_L) {
+            } else if (lex.type() == LEX_PARENTHESIS_L) {
                 /**/pst = pst->add_suc(NODE_EXPR);
                 pst = pst->add_suc(NODE_EXPR);
             } else {
-                _err(lex);
+                _err(lex.word());
             }
         } else if (pst->type == NODE_DECL) {
-            if (lex_type == LEX_VAR) {
-                pst = pst->add_suc(NODE_VAR, lex);
+            if (lex.type() == LEX_VAR) {
+                pst = pst->add_suc(NODE_VAR, lex.word());
             } else {
-                _err(lex);
+                _err(lex.word());
             }
         } else if (pst->type == NODE_VAR) {
-            if (lex_type == LEX_OPER_2_RET) {
+            if (lex.type() == LEX_OPER_2_RET) {
                 pst = pst->add_suc(NODE_VAR_INIT);
-            } else if (lex_type == LEX_OPER_COMMA) {
+            } else if (lex.type() == LEX_OPER_COMMA) {
                 tid.add(pst->predecessor->lex, pst->lex);
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_OPER_END) {
+            } else if (lex.type() == LEX_OPER_END) {
                 tid.add(pst->predecessor->lex, pst->lex);
                 pst = pst->predecessor;
                 pst = pst->predecessor;
             } else {
-                _err(lex);
+                _err(lex.word());
             }
         } else if (pst->type == NODE_VAR_INIT) {
-            if (lex_type == LEX_CONST || lex_type == LEX_VAR) {
-                /*?*/pst = pst->add_suc(NODE_OPERAND, lex);
+            if (lex.type() == LEX_CONST || lex.type() == LEX_VAR) {
+                /*?*/pst = pst->add_suc(NODE_OPERAND, lex.word());
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_OPER_2_RET || lex_type == LEX_OPER_2_NORET) {
-                /*?*/pst = pst->add_suc(NODE_OPER_2, lex);
+            } else if (lex.type() == LEX_OPER_2_RET || lex.type() == LEX_OPER_2_NORET) {
+                /*?*/pst = pst->add_suc(NODE_OPER_2, lex.word());
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_PARENTHESIS_L) {
+            } else if (lex.type() == LEX_PARENTHESIS_L) {
                 /*?*/pst = pst->add_suc(NODE_EXPR);
-            } else if (lex_type == LEX_OPER_COMMA) {
+            } else if (lex.type() == LEX_OPER_COMMA) {
                 /*?*/tid.add(pst->predecessor->predecessor->lex, pst->predecessor->lex);
                 pst = pst->predecessor;
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_OPER_END) {
+            } else if (lex.type() == LEX_OPER_END) {
                 /*?*/tid.add(pst->predecessor->predecessor->lex, pst->predecessor->lex);
                 pst = pst->predecessor;
                 pst = pst->predecessor;
                 pst = pst->predecessor;
             } else {
-                _err(lex);
+                _err(lex.word());
             }
         } else if (pst->type == NODE_EXPR) {
-            if (lex_type == LEX_CONST || lex_type == LEX_VAR) {
-                /*?*/pst = pst->add_suc(NODE_OPERAND, lex);
+            if (lex.type() == LEX_CONST || lex.type() == LEX_VAR) {
+                /*?*/pst = pst->add_suc(NODE_OPERAND, lex.word());
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_OPER_2_RET || lex_type == LEX_OPER_2_NORET) {
-                /*?*/pst = pst->add_suc(NODE_OPER_2, lex);
+            } else if (lex.type() == LEX_OPER_2_RET || lex.type() == LEX_OPER_2_NORET) {
+                /*?*/pst = pst->add_suc(NODE_OPER_2, lex.word());
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_PARENTHESIS_L) {
+            } else if (lex.type() == LEX_PARENTHESIS_L) {
                 /*?*/pst = pst->add_suc(NODE_EXPR);
-            } else if (lex_type == LEX_PARENTHESIS_R) {
+            } else if (lex.type() == LEX_PARENTHESIS_R) {
                 pst = pst->predecessor;
-            } else if (lex_type == LEX_OPER_COMMA) {
+            } else if (lex.type() == LEX_OPER_COMMA) {
                 while (pst->type == NODE_EXPR) {
                     pst = pst->predecessor;
                 }
@@ -262,7 +263,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
                     pst = pst->predecessor;
                     pst = pst->predecessor;
                 }
-            } else if (lex_type == LEX_OPER_END) {
+            } else if (lex.type() == LEX_OPER_END) {
                 while (pst->type == NODE_EXPR) {
                     pst = pst->predecessor;
                 }
@@ -282,10 +283,10 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
         } else if (pst->type == NODE_UNTIL) {
             /**/
         } else if (pst->type == NODE_OPER_LOOP) {
-            if (lex_type == LEX_OPER_END) {
+            if (lex.type() == LEX_OPER_END) {
                 pst = pst->predecessor;
             } else {
-                _err(lex);
+                _err(lex.word());
             }
         } else if (pst->type == NODE_OPER_IN) {
             /**/
@@ -298,10 +299,10 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_dep
 
 SyntTree build_synt_tree(std::ifstream & ifs, TID & tid)
 {
-    ret_vals ret = RET_OK;
-    std::string lex = get_lex(ifs, ret);
-    if (ret != RET_OK || define_lex_type(lex) != LEX_BEGIN) {
-        _err(rw::BEGIN, lex);
+    RetVal ret = RET_OK;
+    Lex lex = get_lex(ifs, ret);
+    if (ret != RET_OK || lex.type() != LEX_BEGIN) {
+        _err(rw::BEGIN, lex.word());
     }
     SyntTree st(NODE_BEGIN);
     SyntTree * pst = &st;
