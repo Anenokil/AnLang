@@ -35,7 +35,7 @@ void TID::TID_Line::set_init(std::string const & init_raw)
     init_ = init_raw;
 }
 
-id_types TID::TID_Line::get_type() const
+IDType TID::TID_Line::get_type() const
 {
     return type_;
 }

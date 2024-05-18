@@ -27,7 +27,7 @@ SyntTree & SyntTree::assign(SyntTree const & st)
     return *this;
 }
 
-SyntTree * SyntTree::add_suc(node_types type, std::string lex)
+SyntTree * SyntTree::add_suc(NodeType type, std::string lex)
 {
     if (suc_cnt == 0) {
         successors = new SyntTree[1];
@@ -48,7 +48,7 @@ SyntTree * SyntTree::add_suc(node_types type, std::string lex)
     return &(successors[suc_cnt - 1]);
 }
 
-SyntTree::SyntTree(node_types type, std::string lex, SyntTree * predecessor): type(type), lex(lex), predecessor(predecessor), successors(nullptr), suc_cnt(0)
+SyntTree::SyntTree(NodeType type, std::string lex, SyntTree * predecessor): type(type), lex(lex), predecessor(predecessor), successors(nullptr), suc_cnt(0)
 {}
 
 SyntTree::SyntTree(SyntTree const & st)

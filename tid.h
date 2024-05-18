@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-enum id_types {
+enum IDType {
     ID_TYPE_UNKNOWN,
     ID_TYPE_INT,
     ID_TYPE_FLOAT,
@@ -19,7 +19,7 @@ private:
     class TID_Line
     {
     private:
-        id_types type_{};
+        IDType type_{};
         std::string name_{};
         std::string init_{};
 
@@ -28,7 +28,7 @@ private:
         void set_type(std::string const & type_raw);
         void set_name(std::string const & name_raw);
         void set_init(std::string const & init_raw);
-        id_types get_type() const;
+        IDType get_type() const;
         std::string get_typename() const;
         std::string get_name() const;
         std::string get_init() const;
