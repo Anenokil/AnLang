@@ -74,7 +74,7 @@ LexType Lex::define_lex_type(std::string const & lex)
     return LEX_UNKNOWN;
 }
 
-Lex::Lex(std::string const & str): word_(str), type_(define_lex_type(str))
+Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), type_(define_lex_type(str)), row_(row), col_(col)
 {}
 
 std::string Lex::word() const
@@ -85,6 +85,16 @@ std::string Lex::word() const
 LexType Lex::type() const
 {
     return type_;
+}
+
+unsigned Lex::row() const
+{
+    return row_;
+}
+
+unsigned Lex::col() const
+{
+    return col_;
 }
 
 FlagVal _get_flag(char c)
@@ -137,15 +147,23 @@ bool _has_correct_flag(char c, FlagVal & flag)
 
 Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
 {
+    static unsigned row = 1;
+    static unsigned col = 0;
     static char c = ' ';
 
     /* read space characters */
     while (!ifs.eof() && std::isspace(c)) {
         c = ifs.get();
+        if (c == '\n') {
+            col = 0;
+            ++row;
+        } else {
+            ++col;
+        }
     }
     if (ifs.eof()) {
         ret = RET_EOF;
-        return Lex("");
+        return Lex("", row, col);
     }
 
     /* read the first non-space character */
@@ -153,23 +171,31 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
     if (flag == FL_ERROR) {
         ret = RET_ERR;
         if (to_throw) {
-            throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
+            throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
         }
-        return Lex("");
+        return Lex("", row, col);
     }
+    unsigned const row_lex = row;
+    unsigned const col_lex = col;
 
     /* read following characters */
     std::string res = "";
     do {
         res += c;
         c = ifs.get();
+        if (c == '\n') {
+            col = 0;
+            ++row;
+        } else {
+            ++col;
+        }
     } while (!ifs.eof() && _has_correct_flag(c, flag));
     if (flag == FL_ERROR) {
         ret = RET_ERR;
         if (to_throw) {
-            throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
+            throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
         }
-        return Lex("");
+        return Lex("", row, col);
     }
 
     /* return a result */
@@ -177,5 +203,5 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
         ret = RET_EOF;
     }
     ret = RET_OK;
-    return Lex(res);
+    return Lex(res, row_lex, col_lex);
 }
