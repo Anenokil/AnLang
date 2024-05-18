@@ -54,7 +54,7 @@ private:
     SyntTree(SyntTree const & st);
     SyntTree & operator=(SyntTree const & st);
 
-    friend void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, int & scope_depth, int & loop_depth);
+    friend void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexType until, int & scope_depth, int & loop_depth);
 
 public:
     SyntTree(std::ifstream & ifs, TID & tid);
