@@ -148,12 +148,12 @@ std::ostream & operator<<(std::ostream & os, SyntTree const & st)
 
 void _err(Lex const & got, LexType exp)
 {
-    throw std::runtime_error("Invalid lexeme: type '" + std::to_string(exp) + "' is expected but got '" + got.word() + "'.");
+    throw std::runtime_error(std::to_string(got.row()) + " line, " + std::to_string(got.col()) + " column: Invalid lexeme: type '" + std::to_string(exp) + "' is expected but got '" + got.word() + "'.");
 }
 
 void _err(Lex const & got)
 {
-    throw std::runtime_error("Invalid lexeme: '" + got.word() + "'.");
+    throw std::runtime_error(std::to_string(got.row()) + " line, " + std::to_string(got.col()) + " column: Invalid lexeme: '" + got.word() + "'.");
 }
 
 Lex _get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw_on_eof = true, bool to_throw_on_err = true)
@@ -174,13 +174,15 @@ Lex _get_lex(std::ifstream & ifs, RetVal & ret, LexType req_type, bool to_throw_
     return lex;
 }
 
+bool _is_multi_separator(LexType sep_type)
+{
+    return sep_type == LEX_OPER_END;
+}
+
 void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexType until, int & scope_depth, int & loop_depth)
 {
     RetVal ret;
 
-    /*if (pst->type == NODE_BEGIN) {
-        //_err(lex); // if scope_depth == 0
-    } else */
     if (pst->type == NODE_SCOPE) {
         if (lex.type() == LEX_SCOPE_L) {
             ++scope_depth;
@@ -190,21 +192,22 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
             pst = pst->predecessor;
         } else if (lex.type() == LEX_SCOPE_R) {
             --scope_depth;
-            //pst = pst->predecessor;
             return;
         } else if (lex.type() == LEX_TYPE) {
             pst = pst->add_suc(NODE_DECL, lex.word());
             lex = _get_lex(ifs, ret);
             create_node(ifs, tid, pst, lex, LEX_OPER_END, scope_depth, loop_depth);
             pst = pst->predecessor;
-        /*} else if (lex.type() == LEX_IF) {
+        } else if (lex.type() == LEX_IF) {
             pst = pst->add_suc(NODE_IF);
 
-            pst = pst->add_suc(NODE_EXPR);
             _get_lex(ifs, ret, LEX_PARENTHESIS_L);
+            pst = pst->add_suc(NODE_EXPR);
             lex = _get_lex(ifs, ret);
             create_node(ifs, tid, pst, lex, LEX_PARENTHESIS_R, scope_depth, loop_depth);
+            pst = pst->predecessor;
 
+            ++scope_depth;
             pst = pst->add_suc(NODE_SCOPE);
             lex = _get_lex(ifs, ret);
             if (lex.type() == LEX_SCOPE_L) {
@@ -213,7 +216,10 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
             } else {
                 create_node(ifs, tid, pst, lex, LEX_OPER_END, scope_depth, loop_depth);
             }
-        } else if (lex.type() == LEX_FOR) {
+            pst = pst->predecessor;
+
+            pst = pst->predecessor;
+        /*} else if (lex.type() == LEX_FOR) {
             pst = pst->add_suc(NODE_FOR);
         } else if (lex.type() == LEX_WHILE) {
             pst = pst->add_suc(NODE_WHILE);
@@ -228,10 +234,7 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
         } else if (lex.type() == LEX_CONST || lex.type() == LEX_VAR) {
             pst = pst->add_suc(NODE_EXPR);
             pst = pst->add_suc(NODE_OPERAND, lex.word());
-            pst = pst->predecessor;
-        } else if (lex.type() == LEX_PARENTHESIS_L) {
-            pst = pst->add_suc(NODE_EXPR);
-            pst = pst->add_suc(NODE_EXPR);*/
+            pst = pst->predecessor;*/
         } else {
             _err(lex);
         }
@@ -249,8 +252,6 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
             pst = pst->predecessor;
         } else if (lex.type() == LEX_OPER_END) {
             tid.add(pst->predecessor->lex, pst->lex);
-            //pst = pst->predecessor;
-            //pst = pst->predecessor;
             return;
         } else {
             _err(lex);
@@ -273,9 +274,6 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
             pst = pst->predecessor;
         } else if (lex.type() == LEX_OPER_END) {
             tid.add(pst->predecessor->predecessor->lex, pst->predecessor->lex);
-            //pst = pst->predecessor;
-            //pst = pst->predecessor;
-            //pst = pst->predecessor;
             return;
         } else {
             _err(lex);
@@ -294,25 +292,6 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
             pst = pst->predecessor;
         } else if (lex.type() == LEX_PARENTHESIS_R) {
             return;
-        /*} else if (lex.type() == LEX_OPER_COMMA) {
-            while (pst->type == NODE_EXPR) {
-                pst = pst->predecessor;
-            }
-            if (pst->type == NODE_VAR_INIT) {
-                tid.add(pst->predecessor->predecessor->lex, pst->predecessor->lex);
-                pst = pst->predecessor;
-                pst = pst->predecessor;
-            }
-        } else if (lex.type() == LEX_OPER_END) {
-            while (pst->type == NODE_EXPR) {
-                pst = pst->predecessor;
-            }
-            if (pst->type == NODE_VAR_INIT) {
-                tid.add(pst->predecessor->predecessor->lex, pst->predecessor->lex);
-                pst = pst->predecessor;
-                pst = pst->predecessor;
-                pst = pst->predecessor;
-            }*/
         } else {
             _err(lex);
         }
@@ -323,17 +302,16 @@ void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexT
     } else if (pst->type == NODE_UNTIL) {
         /**/
     } else if (pst->type == NODE_OPER_LOOP) {
-        /*if (lex.type() == LEX_OPER_END) {
-            pst = pst->predecessor;
-        } else {
-            _err(lex);
-        }*/
+        /**/
     } else if (pst->type == NODE_OPER_IN) {
         /**/
     } else if (pst->type == NODE_OPER_OUT) {
         /**/
     }
 
+    if (lex.type() == until && _is_multi_separator(until)) {
+        return;
+    }
     lex = _get_lex(ifs, ret);
     create_node(ifs, tid, pst, lex, until, scope_depth, loop_depth);
 }
