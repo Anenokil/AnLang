@@ -1,0 +1,3 @@
+program {
+    int t} # <-- syntax error here #
+}

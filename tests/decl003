@@ -1,0 +1,7 @@
+program { 
+    {
+        bool a, b = (5 + 3) * 2, c;
+        float f;
+    }
+    int i = b;
+}
