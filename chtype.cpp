@@ -46,3 +46,13 @@ bool is_name_quant(char c)
 {
     return std::isalpha(c) || c == '_';
 }
+
+bool is_comment_beg(char c)
+{
+    return c == '#';
+}
+
+bool is_comment_end(char c)
+{
+    return c == '#';
+}

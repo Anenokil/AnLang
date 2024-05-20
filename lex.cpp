@@ -150,9 +150,7 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
     static unsigned row = 1;
     static unsigned col = 0;
     static char c = ' ';
-
-    /* read space characters */
-    while (!ifs.eof() && std::isspace(c)) {
+    static auto iter = [&ifs](){
         c = ifs.get();
         if (c == '\n') {
             col = 0;
@@ -160,6 +158,17 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
         } else {
             ++col;
         }
+    };
+
+    /* read space characters */
+    while (!ifs.eof() && (std::isspace(c) || is_comment_beg(c))) {
+        if (is_comment_beg(c)) {
+            iter();
+            while (!ifs.eof() && !is_comment_end(c)) {
+                iter();
+            }
+        }
+        iter();
     }
     if (ifs.eof()) {
         ret = RET_EOF;
@@ -182,13 +191,7 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
     std::string res = "";
     do {
         res += c;
-        c = ifs.get();
-        if (c == '\n') {
-            col = 0;
-            ++row;
-        } else {
-            ++col;
-        }
+        iter();
     } while (!ifs.eof() && _has_correct_flag(c, flag));
     if (flag == FL_ERROR) {
         ret = RET_ERR;
