@@ -11,10 +11,6 @@ enum NodeType {
     NODE_TMP,
     NODE_BEGIN,
     NODE_SCOPE,
-    NODE_BREAK,
-    NODE_CONT,
-    NODE_READ,
-    NODE_WRITE,
     NODE_DECL,
     NODE_OPER_LOOP,
     NODE_OPER_IN,
@@ -56,13 +52,19 @@ private:
     SyntTree(SyntTree const & st);
     SyntTree & operator=(SyntTree const & st);
 
-    friend void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexType until, int & scope_depth, int & loop_depth);
+    friend void parse_scope(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+    friend void parse_statement(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+    friend void parse_if(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+    friend void parse_decl(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+    friend void parse_var(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+    friend void parse_var_init(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+    friend void parse_expr(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
 
 public:
     SyntTree(std::ifstream & ifs, TID & tid);
     ~SyntTree();
     friend std::ostream & operator<<(std::ostream & os, SyntTree const & st);
-    friend SyntTree build_synt_tree(std::ifstream & ifs, TID & tid);
+    friend SyntTree parse_program(std::ifstream & ifs, TID & tid);
 };
 
 #endif
