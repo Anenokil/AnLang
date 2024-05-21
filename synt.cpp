@@ -313,7 +313,7 @@ void Parser::parse_expr(SyntTree * pst)
     // return;
 }
 
-Parser::Parser(std::ifstream & ifs, TID & tid): ifs(ifs), tid(tid), st(NODE_BEGIN), cur_lex()
+Parser::Parser(std::ifstream & ifs): ifs(ifs), tid(), st(NODE_BEGIN), cur_lex()
 {
     parse_program();
 }

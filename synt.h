@@ -76,7 +76,7 @@ private:
     void parse_expr(SyntTree * pst);
 
 public:
-    Parser(std::ifstream & ifs, TID & tid);
+    Parser(std::ifstream & ifs);
     friend std::ostream & operator<<(std::ostream & os, Parser const & par);
 };
 

@@ -15,8 +15,7 @@ int main()
     std::ifstream ifs(ifn);
     if (ifs.is_open()) {
         /* form SyntTree and TID and print them */
-        TID tid;
-        Parser par(ifs, tid);
+        Parser par(ifs);
         std::cout << par;
     }
 }
