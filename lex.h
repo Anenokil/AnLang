@@ -4,12 +4,6 @@
 #include <fstream>
 #include <string>
 
-enum RetVal {
-    RET_OK,
-    RET_ERR,
-    RET_EOF,
-};
-
 enum LexType {
     LEX_TMP, // initial temporary value
     LEX_UNKNOWN,
@@ -34,6 +28,7 @@ enum LexType {
     LEX_SCOPE_R,
     LEX_PARENTHESIS_L,
     LEX_PARENTHESIS_R,
+    LEX_EOF,
 };
 
 class Lex
@@ -50,15 +45,22 @@ private:
 public:
     Lex();
     Lex(std::string const & str, unsigned row, unsigned col);
+    Lex(unsigned row, unsigned col); // EOF
     std::string word() const;
     LexType type() const;
     unsigned row() const;
     unsigned col() const;
 };
 
-/* the function gets one lexeme from file and returns it;
-* sets 'ret' value;
-* if to_throw sets on true, throws an error instead of RET_ERR returns */
-Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw = true);
+/*class Scanner
+{
+private:
+
+};*/
+
+/* the function gets one lexeme from file;
+ * returns true if OK and false if an error appears;
+ * if to_throw sets on true, throws an error instead of RET_ERR returns */
+bool get_lex(std::ifstream & ifs, Lex & lex, bool to_throw = true);
 
 #endif

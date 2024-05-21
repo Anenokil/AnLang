@@ -160,35 +160,30 @@ void _err(Lex const & got)
     throw std::runtime_error(std::to_string(got.row()) + " line, " + std::to_string(got.col()) + " column: Invalid lexeme: '" + got.word() + "'.");
 }
 
-Lex _get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw_on_eof = true, bool to_throw_on_err = true)
+bool _get_lex(std::ifstream & ifs, Lex & lex, bool to_throw_on_err = true)
 {
-    Lex lex = get_lex(ifs, ret, to_throw_on_err);
-    if (ret == RET_EOF && to_throw_on_eof) {
-        _err(lex);
-    }
-    return lex;
+    return get_lex(ifs, lex, to_throw_on_err);
 }
 
-Lex _get_lex(std::ifstream & ifs, RetVal & ret, LexType req_type, bool to_throw_on_eof = true, bool to_throw_on_err = true)
+bool _get_lex(std::ifstream & ifs, Lex & lex, LexType req_type, bool to_throw_on_err = true)
 {
-    Lex lex = get_lex(ifs, ret, to_throw_on_err);
-    if (ret == RET_EOF && to_throw_on_eof || lex.type() != req_type) {
+    bool ret = get_lex(ifs, lex, to_throw_on_err);
+    if (lex.type() != req_type) {
         _err(lex, req_type);
     }
-    return lex;
+    return ret;
 }
 
 void Parser::parse_program()
 {
-    RetVal ret = RET_OK;
-    cur_lex = _get_lex(ifs, ret, LEX_BEGIN);
+    _get_lex(ifs, cur_lex, LEX_BEGIN);
     SyntTree * pst = &st;
 
-    cur_lex = _get_lex(ifs, ret, LEX_SCOPE_L);
+    _get_lex(ifs, cur_lex, LEX_SCOPE_L);
     parse_scope(pst);
 
-    /*cur_lex = _get_lex(ifs, ret, false);
-    if (ret != RET_EOF) {
+    /*_get_lex(ifs, cur_lex, false);
+    if (cur_lex.type() != LEX_EOF) {
         _err(cur_lex);
     }*/
 }
@@ -196,19 +191,17 @@ void Parser::parse_program()
 void Parser::parse_scope(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_SCOPE);
-    RetVal ret = RET_OK;
 
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     while (cur_lex.type() != LEX_SCOPE_R) {
         parse_statement(pst);
     }
-    cur_lex = _get_lex(ifs, ret, false);
+    _get_lex(ifs, cur_lex, false);
 }
 
 void Parser::parse_statement(SyntTree * pst)
 {
     //pst = pst->add_suc(NODE_STATEMENT);
-    RetVal ret = RET_OK;
 
     if (cur_lex.type() == LEX_SCOPE_L) {
         parse_scope(pst);
@@ -224,17 +217,16 @@ void Parser::parse_statement(SyntTree * pst)
 void Parser::parse_if(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_IF);
-    RetVal ret = RET_OK;
 
-    cur_lex = _get_lex(ifs, ret, LEX_PARENTHESIS_L);
+    _get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
     parse_expr(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         _err(cur_lex);
     }
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     parse_statement(pst);
     if (cur_lex.type() == LEX_ELSE) {
-        cur_lex = _get_lex(ifs, ret);
+        _get_lex(ifs, cur_lex);
         parse_statement(pst);
     } else {
         // return;
@@ -244,26 +236,24 @@ void Parser::parse_if(SyntTree * pst)
 void Parser::parse_decl(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_DECL, cur_lex.word());
-    RetVal ret = RET_OK;
 
     do {
-        cur_lex = _get_lex(ifs, ret, LEX_VAR);
+        _get_lex(ifs, cur_lex, LEX_VAR);
         parse_var(pst);
     } while (cur_lex.type() == LEX_OPER_COMMA);
     if (cur_lex.type() != LEX_OPER_END) {
         _err(cur_lex);
     }
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_var(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_VAR, cur_lex.word());
-    RetVal ret = RET_OK;
 
     tid.add(pst->predecessor->lex, pst->lex);
 
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     if (cur_lex.type() == LEX_OPER_2_RET) {
         parse_var_init(pst);
     } else if(cur_lex.type() == LEX_OPER_COMMA) {
@@ -277,9 +267,7 @@ void Parser::parse_var(SyntTree * pst)
 
 void Parser::parse_var_init(SyntTree * pst)
 {
-    RetVal ret = RET_OK;
-
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     pst = pst->add_suc(NODE_VAR_INIT, cur_lex.word());
     if (cur_lex.type() == LEX_VAR) {
         //
@@ -289,7 +277,7 @@ void Parser::parse_var_init(SyntTree * pst)
         _err(cur_lex);
     }
 
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     if (cur_lex.type() == LEX_OPER_COMMA) {
         // return;
     } else if (cur_lex.type() == LEX_OPER_END) {
@@ -301,15 +289,13 @@ void Parser::parse_var_init(SyntTree * pst)
 
 void Parser::parse_expr(SyntTree * pst)
 {
-    RetVal ret = RET_OK;
-
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     /**/pst = pst->add_suc(NODE_EXPR, cur_lex.word());
     if (cur_lex.type() != LEX_VAR && cur_lex.type() != LEX_CONST) {
         _err(cur_lex);
     }
 
-    cur_lex = _get_lex(ifs, ret);
+    _get_lex(ifs, cur_lex);
     // return;
 }
 

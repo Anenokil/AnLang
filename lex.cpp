@@ -80,6 +80,9 @@ Lex::Lex(): word_(""), type_(LEX_TMP), row_(0), col_(0)
 Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), type_(define_lex_type(str)), row_(row), col_(col)
 {}
 
+Lex::Lex(unsigned row, unsigned col): word_(""), type_(LEX_EOF), row_(row), col_(col)
+{}
+
 std::string Lex::word() const
 {
     return word_;
@@ -148,7 +151,7 @@ bool _has_correct_flag(char c, FlagVal & flag)
     return false; /* unknown flag */
 }
 
-Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
+bool get_lex(std::ifstream & ifs, Lex & lex, bool to_throw)
 {
     static unsigned row = 1;
     static unsigned col = 0;
@@ -174,18 +177,18 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
         iter();
     }
     if (ifs.eof()) {
-        ret = RET_EOF;
-        return Lex("", row, col);
+        lex = Lex(row, col);
+        return true;
     }
 
     /* read the first non-space character */
     FlagVal flag = _get_flag(c);
     if (flag == FL_ERROR) {
-        ret = RET_ERR;
         if (to_throw) {
             throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
         }
-        return Lex("", row, col);
+        lex = Lex("", row, col);
+        return false;
     }
     unsigned const row_lex = row;
     unsigned const col_lex = col;
@@ -197,17 +200,17 @@ Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
         iter();
     } while (!ifs.eof() && _has_correct_flag(c, flag));
     if (flag == FL_ERROR) {
-        ret = RET_ERR;
         if (to_throw) {
             throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
         }
-        return Lex("", row, col);
+        lex = Lex("", row, col);
+        return false;
     }
 
     /* return a result */
     if (ifs.eof()) {
-        ret = RET_EOF;
+        lex = Lex(row_lex, col_lex);
     }
-    ret = RET_OK;
-    return Lex(res, row_lex, col_lex);
+    lex = Lex(res, row_lex, col_lex);
+    return true;
 }
