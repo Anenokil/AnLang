@@ -14,99 +14,6 @@ enum FlagVal {
     FL_ERROR,
 };
 
-FlagVal _get_flag(char c)
-{
-    if (is_name_quant(c)) {
-        return FL_NAME;
-    } else if (is_num_quant(c)) {
-        return FL_NUM;
-    } else if (is_quot(c)) {
-        return FL_TEXT;
-    } else if (is_spec_beg(c)) {
-        return FL_SPEC;
-    } else if (is_spec_end(c)) {
-        return FL_SPEC_END;
-    } else {
-        return FL_ERROR;
-    }
-}
-
-bool _has_correct_flag(char c, FlagVal & flag)
-{
-    if (flag == FL_NAME) {
-        return is_name_quant(c);
-    } else if (flag == FL_NUM) {
-        return is_num_quant(c);
-    } else if (flag == FL_TEXT) {
-        if (is_escape(c)) {
-            flag = FL_TEXT_ESCAPE;
-        } else if (is_quot(c)) {
-            flag = FL_TEXT_END;
-        }
-        return true;
-    } else if (flag == FL_TEXT_ESCAPE) {
-        if (is_escapable(c)) {
-            flag = FL_TEXT;
-            return true;
-        }
-        flag = FL_ERROR;
-        return false;
-    } else if (flag == FL_TEXT_END) {
-        return false;
-    } else if (flag == FL_SPEC) {
-        flag = FL_SPEC_END;
-        return is_spec_end(c);
-    } else if (flag == FL_SPEC_END) {
-        return false;
-    }
-    return false; /* unknown flag */
-}
-
-Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
-{
-    static char c = ' ';
-
-    /* read space characters */
-    while (!ifs.eof() && std::isspace(c)) {
-        c = ifs.get();
-    }
-    if (ifs.eof()) {
-        ret = RET_EOF;
-        return Lex("");
-    }
-
-    /* read the first non-space character */
-    FlagVal flag = _get_flag(c);
-    if (flag == FL_ERROR) {
-        ret = RET_ERR;
-        if (to_throw) {
-            throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
-        }
-        return Lex("");
-    }
-
-    /* read following characters */
-    std::string res = "";
-    do {
-        res += c;
-        c = ifs.get();
-    } while (!ifs.eof() && _has_correct_flag(c, flag));
-    if (flag == FL_ERROR) {
-        ret = RET_ERR;
-        if (to_throw) {
-            throw std::runtime_error("Unexpected character '" + std::string(1, c) + "'.");
-        }
-        return Lex("");
-    }
-
-    /* return a result */
-    if (ifs.eof()) {
-        ret = RET_EOF;
-    }
-    ret = RET_OK;
-    return Lex(res);
-}
-
 bool _is_var_name(std::string const & lex)
 {
     for (char c: lex) {
@@ -167,7 +74,7 @@ LexType Lex::define_lex_type(std::string const & lex)
     return LEX_UNKNOWN;
 }
 
-Lex::Lex(std::string const & str): word_(str), type_(define_lex_type(str))
+Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), type_(define_lex_type(str)), row_(row), col_(col)
 {}
 
 std::string Lex::word() const
@@ -178,4 +85,126 @@ std::string Lex::word() const
 LexType Lex::type() const
 {
     return type_;
+}
+
+unsigned Lex::row() const
+{
+    return row_;
+}
+
+unsigned Lex::col() const
+{
+    return col_;
+}
+
+FlagVal _get_flag(char c)
+{
+    if (is_name_quant(c)) {
+        return FL_NAME;
+    } else if (is_num_quant(c)) {
+        return FL_NUM;
+    } else if (is_quot(c)) {
+        return FL_TEXT;
+    } else if (is_spec_beg(c)) {
+        return FL_SPEC;
+    } else if (is_spec_end(c)) {
+        return FL_SPEC_END;
+    } else {
+        return FL_ERROR;
+    }
+}
+
+bool _has_correct_flag(char c, FlagVal & flag)
+{
+    if (flag == FL_NAME) {
+        return is_name_quant(c);
+    } else if (flag == FL_NUM) {
+        return is_num_quant(c);
+    } else if (flag == FL_TEXT) {
+        if (is_escape(c)) {
+            flag = FL_TEXT_ESCAPE;
+        } else if (is_quot(c)) {
+            flag = FL_TEXT_END;
+        }
+        return true;
+    } else if (flag == FL_TEXT_ESCAPE) {
+        if (is_escapable(c)) {
+            flag = FL_TEXT;
+            return true;
+        }
+        flag = FL_ERROR;
+        return false;
+    } else if (flag == FL_TEXT_END) {
+        return false;
+    } else if (flag == FL_SPEC) {
+        flag = FL_SPEC_END;
+        return is_spec_end(c);
+    } else if (flag == FL_SPEC_END) {
+        return false;
+    }
+    return false; /* unknown flag */
+}
+
+Lex get_lex(std::ifstream & ifs, RetVal & ret, bool to_throw)
+{
+    static unsigned row = 1;
+    static unsigned col = 0;
+    static char c = ' ';
+    static auto iter = [&ifs](){
+        c = ifs.get();
+        if (c == '\n') {
+            col = 0;
+            ++row;
+        } else {
+            ++col;
+        }
+    };
+
+    /* read space characters */
+    while (!ifs.eof() && (std::isspace(c) || is_comment_beg(c))) {
+        if (is_comment_beg(c)) {
+            iter();
+            while (!ifs.eof() && !is_comment_end(c)) {
+                iter();
+            }
+        }
+        iter();
+    }
+    if (ifs.eof()) {
+        ret = RET_EOF;
+        return Lex("", row, col);
+    }
+
+    /* read the first non-space character */
+    FlagVal flag = _get_flag(c);
+    if (flag == FL_ERROR) {
+        ret = RET_ERR;
+        if (to_throw) {
+            throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
+        }
+        return Lex("", row, col);
+    }
+    unsigned const row_lex = row;
+    unsigned const col_lex = col;
+
+    /* read following characters */
+    std::string res = "";
+    do {
+        res += c;
+        iter();
+    } while (!ifs.eof() && _has_correct_flag(c, flag));
+    if (flag == FL_ERROR) {
+        ret = RET_ERR;
+        if (to_throw) {
+            throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
+        }
+        return Lex("", row, col);
+    }
+
+    /* return a result */
+    if (ifs.eof()) {
+        ret = RET_EOF;
+    }
+    ret = RET_OK;
+    return Lex(res, row_lex, col_lex);
 }

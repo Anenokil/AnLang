@@ -7,7 +7,7 @@
 #include "tid.h"
 #include "lex.h"
 
-enum node_types {
+enum NodeType {
     NODE_TMP,
     NODE_BEGIN,
     NODE_SCOPE,
@@ -40,21 +40,23 @@ enum node_types {
 class SyntTree
 {
 private:
-    node_types type{};
+    NodeType type{};
     std::string lex{};
     SyntTree * predecessor{};
     SyntTree * successors{};
     unsigned suc_cnt{};
 
-    SyntTree * add_suc(node_types type = NODE_TMP, std::string lex = "");
+    SyntTree * add_suc(NodeType type = NODE_TMP, std::string lex = "");
     void del_all_suc();
     SyntTree & assign(SyntTree const & st);
     std::string get_typename() const;
     std::ostream & print(std::ostream & os, unsigned tab = 0) const;
 
-    SyntTree(node_types type = NODE_BEGIN, std::string lex = "", SyntTree * predecessor = nullptr);
+    SyntTree(NodeType type = NODE_BEGIN, std::string lex = "", SyntTree * predecessor = nullptr);
     SyntTree(SyntTree const & st);
     SyntTree & operator=(SyntTree const & st);
+
+    friend void create_node(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex, LexType until, int & scope_depth, int & loop_depth);
 
 public:
     SyntTree(std::ifstream & ifs, TID & tid);

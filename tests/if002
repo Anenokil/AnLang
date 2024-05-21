@@ -1,0 +1,5 @@
+program {
+    if (a) { int b; int c, c_; bool d; }
+    if (x) float y;
+    str s;
+}

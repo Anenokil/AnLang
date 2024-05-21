@@ -40,14 +40,18 @@ class Lex
 private:
     std::string word_{};
     LexType type_{};
+    unsigned row_{};
+    unsigned col_{};
 
     /* the function receives a lexeme and returns its type */
     LexType define_lex_type(std::string const & lex);
     
 public:
-    explicit Lex(std::string const & str);
+    Lex(std::string const & str, unsigned row, unsigned col);
     std::string word() const;
     LexType type() const;
+    unsigned row() const;
+    unsigned col() const;
 };
 
 /* the function gets one lexeme from file and returns it;
