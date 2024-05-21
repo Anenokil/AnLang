@@ -1,0 +1,8 @@
+program {
+    if (a)
+        int x;
+    else if (b)
+        int y; 
+    else
+        int z;
+}
