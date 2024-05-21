@@ -11,6 +11,7 @@ enum RetVal {
 };
 
 enum LexType {
+    LEX_TMP, // initial temporary value
     LEX_UNKNOWN,
     LEX_BEGIN,
     LEX_TYPE,
@@ -47,6 +48,7 @@ private:
     LexType define_lex_type(std::string const & lex);
     
 public:
+    Lex();
     Lex(std::string const & str, unsigned row, unsigned col);
     std::string word() const;
     LexType type() const;

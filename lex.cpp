@@ -74,6 +74,9 @@ LexType Lex::define_lex_type(std::string const & lex)
     return LEX_UNKNOWN;
 }
 
+Lex::Lex(): word_(""), type_(LEX_TMP), row_(0), col_(0)
+{}
+
 Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), type_(define_lex_type(str)), row_(row), col_(col)
 {}
 
