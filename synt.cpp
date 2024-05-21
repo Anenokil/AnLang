@@ -178,145 +178,149 @@ Lex _get_lex(std::ifstream & ifs, RetVal & ret, LexType req_type, bool to_throw_
     return lex;
 }
 
-SyntTree parse_program(std::ifstream & ifs, TID & tid)
+void Parser::parse_program()
 {
     RetVal ret = RET_OK;
-    Lex lex = _get_lex(ifs, ret, LEX_BEGIN);
-    SyntTree st(NODE_BEGIN);
+    cur_lex = _get_lex(ifs, ret, LEX_BEGIN);
     SyntTree * pst = &st;
 
-    lex = _get_lex(ifs, ret, LEX_SCOPE_L);
-    parse_scope(ifs, tid, pst, lex);
+    cur_lex = _get_lex(ifs, ret, LEX_SCOPE_L);
+    parse_scope(pst);
 
-    /*lex = _get_lex(ifs, ret, false);
+    /*cur_lex = _get_lex(ifs, ret, false);
     if (ret != RET_EOF) {
-        _err(lex);
+        _err(cur_lex);
     }*/
-
-    return st;
 }
 
-void parse_scope(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_scope(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_SCOPE);
     RetVal ret = RET_OK;
 
-    lex = _get_lex(ifs, ret);
-    while (lex.type() != LEX_SCOPE_R) {
-        parse_statement(ifs, tid, pst, lex);
+    cur_lex = _get_lex(ifs, ret);
+    while (cur_lex.type() != LEX_SCOPE_R) {
+        parse_statement(pst);
     }
-    lex = _get_lex(ifs, ret, false);
+    cur_lex = _get_lex(ifs, ret, false);
 }
 
-void parse_statement(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_statement(SyntTree * pst)
 {
     //pst = pst->add_suc(NODE_STATEMENT);
     RetVal ret = RET_OK;
 
-    if (lex.type() == LEX_SCOPE_L) {
-        parse_scope(ifs, tid, pst, lex);
-    } else if (lex.type() == LEX_TYPE) {
-        parse_decl(ifs, tid, pst, lex);
-    } else if (lex.type() == LEX_IF) {
-        parse_if(ifs, tid, pst, lex);
+    if (cur_lex.type() == LEX_SCOPE_L) {
+        parse_scope(pst);
+    } else if (cur_lex.type() == LEX_TYPE) {
+        parse_decl(pst);
+    } else if (cur_lex.type() == LEX_IF) {
+        parse_if(pst);
     } else {
         //
     }
 }
 
-void parse_if(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_if(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_IF);
     RetVal ret = RET_OK;
 
-    lex = _get_lex(ifs, ret, LEX_PARENTHESIS_L);
-    parse_expr(ifs, tid, pst, lex);
-    if (lex.type() != LEX_PARENTHESIS_R) {
-        _err(lex);
+    cur_lex = _get_lex(ifs, ret, LEX_PARENTHESIS_L);
+    parse_expr(pst);
+    if (cur_lex.type() != LEX_PARENTHESIS_R) {
+        _err(cur_lex);
     }
-    lex = _get_lex(ifs, ret);
-    parse_statement(ifs, tid, pst, lex);
-    if (lex.type() == LEX_ELSE) {
-        lex = _get_lex(ifs, ret);
-        parse_statement(ifs, tid, pst, lex);
+    cur_lex = _get_lex(ifs, ret);
+    parse_statement(pst);
+    if (cur_lex.type() == LEX_ELSE) {
+        cur_lex = _get_lex(ifs, ret);
+        parse_statement(pst);
     } else {
         // return;
     }
 }
 
-void parse_decl(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_decl(SyntTree * pst)
 {
-    pst = pst->add_suc(NODE_DECL, lex.word());
+    pst = pst->add_suc(NODE_DECL, cur_lex.word());
     RetVal ret = RET_OK;
 
     do {
-        lex = _get_lex(ifs, ret, LEX_VAR);
-        parse_var(ifs, tid, pst, lex);
-    } while (lex.type() == LEX_OPER_COMMA);
-    if (lex.type() != LEX_OPER_END) {
-        _err(lex);
+        cur_lex = _get_lex(ifs, ret, LEX_VAR);
+        parse_var(pst);
+    } while (cur_lex.type() == LEX_OPER_COMMA);
+    if (cur_lex.type() != LEX_OPER_END) {
+        _err(cur_lex);
     }
-    lex = _get_lex(ifs, ret);
+    cur_lex = _get_lex(ifs, ret);
 }
 
-void parse_var(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_var(SyntTree * pst)
 {
-    pst = pst->add_suc(NODE_VAR, lex.word());
+    pst = pst->add_suc(NODE_VAR, cur_lex.word());
     RetVal ret = RET_OK;
 
     tid.add(pst->predecessor->lex, pst->lex);
 
-    lex = _get_lex(ifs, ret);
-    if (lex.type() == LEX_OPER_2_RET) {
-        parse_var_init(ifs, tid, pst, lex);
-    } else if(lex.type() == LEX_OPER_COMMA) {
+    cur_lex = _get_lex(ifs, ret);
+    if (cur_lex.type() == LEX_OPER_2_RET) {
+        parse_var_init(pst);
+    } else if(cur_lex.type() == LEX_OPER_COMMA) {
         // return;
-    } else if (lex.type() == LEX_OPER_END) {
+    } else if (cur_lex.type() == LEX_OPER_END) {
         // return;
     } else {
-        _err(lex);
+        _err(cur_lex);
     }
 }
 
-void parse_var_init(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_var_init(SyntTree * pst)
 {
     RetVal ret = RET_OK;
 
-    lex = _get_lex(ifs, ret);
-    pst = pst->add_suc(NODE_VAR_INIT, lex.word());
-    if (lex.type() == LEX_VAR) {
+    cur_lex = _get_lex(ifs, ret);
+    pst = pst->add_suc(NODE_VAR_INIT, cur_lex.word());
+    if (cur_lex.type() == LEX_VAR) {
         //
-    } else if (lex.type() == LEX_CONST) {
+    } else if (cur_lex.type() == LEX_CONST) {
         //
     } else {
-        _err(lex);
+        _err(cur_lex);
     }
 
-    lex = _get_lex(ifs, ret);
-    if (lex.type() == LEX_OPER_COMMA) {
+    cur_lex = _get_lex(ifs, ret);
+    if (cur_lex.type() == LEX_OPER_COMMA) {
         // return;
-    } else if (lex.type() == LEX_OPER_END) {
+    } else if (cur_lex.type() == LEX_OPER_END) {
         // return;
     } else {
-        _err(lex);
+        _err(cur_lex);
     }
 }
 
-void parse_expr(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex)
+void Parser::parse_expr(SyntTree * pst)
 {
     RetVal ret = RET_OK;
 
-    lex = _get_lex(ifs, ret);
-    /**/pst = pst->add_suc(NODE_EXPR, lex.word());
-    if (lex.type() != LEX_VAR && lex.type() != LEX_CONST) {
-        _err(lex);
+    cur_lex = _get_lex(ifs, ret);
+    /**/pst = pst->add_suc(NODE_EXPR, cur_lex.word());
+    if (cur_lex.type() != LEX_VAR && cur_lex.type() != LEX_CONST) {
+        _err(cur_lex);
     }
 
-    lex = _get_lex(ifs, ret);
+    cur_lex = _get_lex(ifs, ret);
     // return;
 }
 
-SyntTree::SyntTree(std::ifstream & ifs, TID & tid)
+Parser::Parser(std::ifstream & ifs, TID & tid): ifs(ifs), tid(tid), st(NODE_BEGIN), cur_lex()
 {
-    *this = parse_program(ifs, tid);
+    parse_program();
+}
+
+std::ostream & operator<<(std::ostream & os, Parser const & par)
+{
+    os << par.st;
+    os << par.tid;
+    return os;
 }

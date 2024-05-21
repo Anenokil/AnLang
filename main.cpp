@@ -16,8 +16,7 @@ int main()
     if (ifs.is_open()) {
         /* form SyntTree and TID and print them */
         TID tid;
-        SyntTree st(ifs, tid);
-        std::cout << st;
-        std::cout << tid;
+        Parser par(ifs, tid);
+        std::cout << par;
     }
 }

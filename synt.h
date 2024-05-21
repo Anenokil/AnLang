@@ -37,34 +37,47 @@ class SyntTree
 {
 private:
     NodeType type{};
-    std::string lex{};
-    SyntTree * predecessor{};
     SyntTree * successors{};
     unsigned suc_cnt{};
 
-    SyntTree * add_suc(NodeType type = NODE_TMP, std::string lex = "");
     void del_all_suc();
     SyntTree & assign(SyntTree const & st);
     std::string get_typename() const;
     std::ostream & print(std::ostream & os, unsigned tab = 0) const;
 
-    SyntTree(NodeType type = NODE_BEGIN, std::string lex = "", SyntTree * predecessor = nullptr);
     SyntTree(SyntTree const & st);
     SyntTree & operator=(SyntTree const & st);
 
-    friend void parse_scope(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
-    friend void parse_statement(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
-    friend void parse_if(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
-    friend void parse_decl(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
-    friend void parse_var(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
-    friend void parse_var_init(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
-    friend void parse_expr(std::ifstream & ifs, TID & tid, SyntTree * pst, Lex & lex);
+public:
+    std::string lex{};
+    SyntTree * predecessor{};
+
+    SyntTree(NodeType type = NODE_BEGIN, std::string lex = "", SyntTree * predecessor = nullptr);
+    ~SyntTree();
+    SyntTree * add_suc(NodeType type = NODE_TMP, std::string lex = "");
+    friend std::ostream & operator<<(std::ostream & os, SyntTree const & st);
+};
+
+class Parser
+{
+private:
+    std::ifstream & ifs;
+    TID tid{};
+    SyntTree st{};
+    Lex cur_lex{};
+
+    void parse_program();
+    void parse_scope(SyntTree * pst);
+    void parse_statement(SyntTree * pst);
+    void parse_if(SyntTree * pst);
+    void parse_decl(SyntTree * pst);
+    void parse_var(SyntTree * pst);
+    void parse_var_init(SyntTree * pst);
+    void parse_expr(SyntTree * pst);
 
 public:
-    SyntTree(std::ifstream & ifs, TID & tid);
-    ~SyntTree();
-    friend std::ostream & operator<<(std::ostream & os, SyntTree const & st);
-    friend SyntTree parse_program(std::ifstream & ifs, TID & tid);
+    Parser(std::ifstream & ifs, TID & tid);
+    friend std::ostream & operator<<(std::ostream & os, Parser const & par);
 };
 
 #endif
