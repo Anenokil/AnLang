@@ -185,10 +185,9 @@ void Parser::parse_program()
     get_lex(ifs, cur_lex, LEX_SCOPE_L);
     parse_scope(pst);
 
-    /*get_lex(ifs, cur_lex, false);
     if (cur_lex.type() != LEX_EOF) {
         err();
-    }*/
+    }
 }
 
 void Parser::parse_scope(SyntTree * pst)
@@ -199,7 +198,7 @@ void Parser::parse_scope(SyntTree * pst)
     while (cur_lex.type() != LEX_SCOPE_R) {
         parse_statement(pst);
     }
-    get_lex(ifs, cur_lex, false);
+    get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_statement(SyntTree * pst)
