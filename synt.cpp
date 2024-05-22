@@ -207,7 +207,7 @@ void Parser::parse_statement(SyntTree * pst)
         parse_scope(pst);
     } else if (cur_lex.type() == LEX_TYPE) {
         parse_decl(pst);
-    } else if (cur_lex.type() == LEX_VAR) {
+    } else if (cur_lex.type() == LEX_ID) {
         parse_assign(pst);
     } else if (cur_lex.type() == LEX_IF) {
         parse_if(pst);
@@ -226,6 +226,20 @@ void Parser::parse_statement(SyntTree * pst)
     } else {
         err();
     }
+}
+
+void Parser::parse_decl(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_DECL, cur_lex.word());
+
+    do {
+        get_lex(ifs, cur_lex, LEX_ID);
+        parse_var(pst);
+    } while (cur_lex.type() == LEX_OPER_COMMA);
+    if (cur_lex.type() != LEX_OPER_END) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_assign(SyntTree * pst)
@@ -259,20 +273,6 @@ void Parser::parse_if(SyntTree * pst)
     }
 }
 
-void Parser::parse_decl(SyntTree * pst)
-{
-    pst = pst->add_suc(NODE_DECL, cur_lex.word());
-
-    do {
-        get_lex(ifs, cur_lex, LEX_VAR);
-        parse_var(pst);
-    } while (cur_lex.type() == LEX_OPER_COMMA);
-    if (cur_lex.type() != LEX_OPER_END) {
-        err();
-    }
-    get_lex(ifs, cur_lex);
-}
-
 void Parser::parse_var(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_VAR, cur_lex.word());
@@ -295,7 +295,7 @@ void Parser::parse_var_init(SyntTree * pst)
 {
     get_lex(ifs, cur_lex);
     pst = pst->add_suc(NODE_VAR_INIT, cur_lex.word());
-    if (cur_lex.type() == LEX_VAR) {
+    if (cur_lex.type() == LEX_ID) {
         //
     } else if (cur_lex.type() == LEX_CONST) {
         //
@@ -317,7 +317,7 @@ void Parser::parse_expr(SyntTree * pst)
 {
     get_lex(ifs, cur_lex);
     /**/pst = pst->add_suc(NODE_EXPR, cur_lex.word());
-    if (cur_lex.type() != LEX_VAR && cur_lex.type() != LEX_CONST) {
+    if (cur_lex.type() != LEX_ID && cur_lex.type() != LEX_CONST) {
         err();
     }
 

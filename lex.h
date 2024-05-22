@@ -9,7 +9,7 @@ enum LexType {
     LEX_UNKNOWN,
     LEX_BEGIN,
     LEX_TYPE,
-    LEX_VAR,
+    LEX_ID,
     LEX_CONST,
     LEX_OPER_COMMA,
     LEX_OPER_END,

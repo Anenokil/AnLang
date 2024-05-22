@@ -4,7 +4,7 @@
 #include "chtype.h"
 
 enum FlagVal {
-    FL_NAME,
+    FL_ID,
     FL_NUM,
     FL_TEXT,
     FL_TEXT_ESCAPE,
@@ -14,10 +14,10 @@ enum FlagVal {
     FL_ERROR,
 };
 
-bool _is_var_name(std::string const & lex)
+bool _is_id(std::string const & lex)
 {
     for (char c: lex) {
-        if (!is_name_quant(c)) {
+        if (!is_id_quant(c)) {
             return false;
         }
     }
@@ -70,7 +70,7 @@ LexType Lex::define_lex_type(std::string const & lex)
     if (lex == rw::PAR_END) return LEX_PARENTHESIS_R;
     if (lex == rw::TYPE_INT || lex == rw::TYPE_FLOAT || lex == rw::TYPE_BOOL || lex == rw::TYPE_STR) return LEX_TYPE;
     if (lex == rw::BOOL_TRUE || lex == rw::BOOL_FALSE || _is_num_const(lex) || _is_str_const(lex)) return LEX_CONST;
-    if (_is_var_name(lex)) return LEX_VAR;
+    if (_is_id(lex)) return LEX_ID;
     return LEX_UNKNOWN;
 }
 
@@ -105,8 +105,8 @@ unsigned Lex::col() const
 
 FlagVal _get_flag(char c)
 {
-    if (is_name_quant(c)) {
-        return FL_NAME;
+    if (is_id_quant(c)) {
+        return FL_ID;
     } else if (is_num_quant(c)) {
         return FL_NUM;
     } else if (is_quot(c)) {
@@ -122,8 +122,8 @@ FlagVal _get_flag(char c)
 
 bool _has_correct_flag(char c, FlagVal & flag)
 {
-    if (flag == FL_NAME) {
-        return is_name_quant(c);
+    if (flag == FL_ID) {
+        return is_id_quant(c);
     } else if (flag == FL_NUM) {
         return is_num_quant(c);
     } else if (flag == FL_TEXT) {

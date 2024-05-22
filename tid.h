@@ -16,7 +16,7 @@ enum IDType {
 class TID
 {
 private:
-    class TID_Line
+    class TIDLine
     {
     private:
         IDType type_{};
@@ -24,7 +24,7 @@ private:
         std::string init_{};
 
     public:
-        TID_Line(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw);
+        TIDLine(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw);
         void set_type(std::string const & type_raw);
         void set_name(std::string const & name_raw);
         void set_init(std::string const & init_raw);
@@ -32,12 +32,12 @@ private:
         std::string get_typename() const;
         std::string get_name() const;
         std::string get_init() const;
-        bool operator==(TID_Line const & other) const;
-        bool operator!=(TID_Line const & other) const;
+        bool operator==(TIDLine const & other) const;
+        bool operator!=(TIDLine const & other) const;
         std::ostream & print(std::ostream & os) const;
     };
 
-    std::vector<TID_Line> lines_{};
+    std::vector<TIDLine> lines_{};
 
 public:
     bool add(std::string const & type = "", std::string const & name = "", std::string const & init = "");

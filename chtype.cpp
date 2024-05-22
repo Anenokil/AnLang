@@ -42,7 +42,7 @@ bool is_num_quant(char c)
     return std::isdigit(c) || is_point(c);
 }
 
-bool is_name_quant(char c)
+bool is_id_quant(char c)
 {
     return std::isalpha(c) || c == '_';
 }
