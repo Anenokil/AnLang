@@ -29,7 +29,7 @@
         <decl_id> ::= <id> ["=" <expr>]
     <assign> ::= <id> "=" <expr> ";"
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
-    <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
+    <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<id> <operator_ret> <expr>] ")" <statement>
     <while> ::= "while" "(" <expr> ")" <statement>
     <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
     <break> ::= "break" ";"
