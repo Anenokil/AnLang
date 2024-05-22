@@ -1,0 +1,11 @@
+program {  # read 6 or less positive numbers and print them multiplied by two #
+    int cnt = 0;
+    do {
+        int x;
+        read x;
+        cnt = cnt + 1;
+        if (x == 0) break;
+        else if (x % 2 == 0) write "even\n";
+        write x * 2, " ";
+    } until (cnt < 6);
+}
