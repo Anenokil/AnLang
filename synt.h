@@ -77,6 +77,9 @@ private:
     void parse_decl(SyntTree * pst);
     void parse_assign(SyntTree * pst);
     void parse_if(SyntTree * pst);
+    void parse_for(SyntTree * pst);
+    void parse_while(SyntTree * pst);
+    void parse_until(SyntTree * pst);
     void parse_oper_loop(SyntTree * pst);
     void parse_oper_in(SyntTree * pst);
     void parse_oper_out(SyntTree * pst);

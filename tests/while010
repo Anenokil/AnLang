@@ -1,0 +1,5 @@
+program {
+    while (true) {
+        write "yes";
+    }
+}

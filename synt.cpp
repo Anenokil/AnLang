@@ -212,11 +212,11 @@ void Parser::parse_statement(SyntTree * pst)
     } else if (cur_lex.type() == LEX_IF) {
         parse_if(pst);
     } else if (cur_lex.type() == LEX_FOR) {
-        //
+        parse_for(pst);
     } else if (cur_lex.type() == LEX_WHILE) {
-        //
-    } else if (cur_lex.type() == LEX_UNTIL) {
-        //
+        parse_while(pst);
+    } else if (cur_lex.type() == LEX_DO) {
+        parse_until(pst);
     } else if (cur_lex.type() == LEX_OPER_LOOP) {
         parse_oper_loop(pst);
     } else if (cur_lex.type() == LEX_OPER_IN) {
@@ -271,6 +271,56 @@ void Parser::parse_if(SyntTree * pst)
     } else {
         // return;
     }
+}
+
+void Parser::parse_for(SyntTree * pst)
+{
+    /*pst = pst->add_suc(NODE_FOR);
+
+    get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    parse_expr(pst);
+    if (cur_lex.type() != LEX_PARENTHESIS_R) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
+    parse_statement(pst);
+    if (cur_lex.type() == LEX_ELSE) {
+        get_lex(ifs, cur_lex);
+        parse_statement(pst);
+    } else {
+        // return;
+    }*/
+}
+
+void Parser::parse_while(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_WHILE);
+
+    get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    parse_expr(pst);
+    if (cur_lex.type() != LEX_PARENTHESIS_R) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
+    parse_statement(pst);
+}
+
+void Parser::parse_until(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_UNTIL);
+
+    get_lex(ifs, cur_lex);
+    parse_statement(pst);
+    if (cur_lex.type() != LEX_UNTIL) {
+        err();
+    }
+    get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    parse_expr(pst);
+    if (cur_lex.type() != LEX_PARENTHESIS_R) {
+        err();
+    }
+    get_lex(ifs, cur_lex, LEX_OPER_END);
+    get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_oper_loop(SyntTree * pst)

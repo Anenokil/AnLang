@@ -1,0 +1,5 @@
+program {
+    do {
+        write "yes";
+    } until (false);
+}
