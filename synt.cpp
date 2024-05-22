@@ -309,35 +309,39 @@ void Parser::parse_if(SyntTree * pst)
 
 void Parser::parse_for(SyntTree * pst)
 {
-    /*pst = pst->add_suc(NODE_FOR);
+    pst = pst->add_suc(NODE_FOR);
 
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    
     get_lex(ifs, cur_lex);
     parse_for_init(pst);
     if (cur_lex.type() != LEX_OPER_END) {
         err();
     }
+
     get_lex(ifs, cur_lex);
     parse_expr(pst);
     if (cur_lex.type() != LEX_OPER_END) {
         err();
     }
+
     get_lex(ifs, cur_lex);
     parse_assign(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         err();
     }
+
     get_lex(ifs, cur_lex);
-    parse_statement(pst);*/
+    parse_statement(pst);
 }
 
 void Parser::parse_for_init(SyntTree * pst)
 {
-    /*if (cur_lex.type() == LEX_TYPE) {
+    if (cur_lex.type() == LEX_TYPE) {
         parse_decl(pst);
     } else if (cur_lex.type() == LEX_ID) {
         parse_assign(pst);
-    }*/
+    }
 }
 
 void Parser::parse_while(SyntTree * pst)
