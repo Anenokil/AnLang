@@ -24,12 +24,13 @@
 
 <type> ::= "int" | "float" | "bool" | "str"
 
-<statement> ::= <scope> | <declaration> | (<assign> ";") | <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write>
-    <declaration> ::= <type> <decl_id> {"," <decl_id>} ";"
+<statement> ::= <scope> | (<declaration> ";") | (<assign> ";") | <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write>
+    <declaration> ::= <type> <decl_id> {"," <decl_id>}
         <decl_id> ::= <id> ["=" <expr>]
-    <assign> ::= <id> <operator_ret> <expr>
+    <assign> ::= <id> <operator_ret> <expr> ["," <assign>]
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
-    <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<assign>] ")" <statement>
+    <for> ::= "for" "(" [<for_init>] ";" [<expr>] ";" [<assign>] ")" <statement>
+        <for_init> ::= <declaration> | <assign>
     <while> ::= "while" "(" <expr> ")" <statement>
     <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
     <break> ::= "break" ";"
