@@ -63,8 +63,8 @@ private:
 
     void err();
     void err(LexType exp);
-    bool get_lex(std::ifstream & ifs, Lex & lex, bool to_throw_on_err = true);
-    bool get_lex(std::ifstream & ifs, Lex & lex, LexType req_type, bool to_throw_on_err = true);
+    bool get_lex();
+    bool get_lex(LexType req_type);
 
     void parse_program();
     void parse_scope(SyntTree * pst);
