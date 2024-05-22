@@ -218,11 +218,11 @@ void Parser::parse_statement(SyntTree * pst)
     } else if (cur_lex.type() == LEX_UNTIL) {
         //
     } else if (cur_lex.type() == LEX_OPER_LOOP) {
-        //
+        parse_oper_loop(pst);
     } else if (cur_lex.type() == LEX_OPER_IN) {
-        //
+        parse_oper_in(pst);
     } else if (cur_lex.type() == LEX_OPER_OUT) {
-        //
+        parse_oper_out(pst);
     } else {
         err();
     }
@@ -271,6 +271,36 @@ void Parser::parse_if(SyntTree * pst)
     } else {
         // return;
     }
+}
+
+void Parser::parse_oper_loop(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_OPER_LOOP, cur_lex.word());
+
+    get_lex(ifs, cur_lex, LEX_OPER_END);
+    get_lex(ifs, cur_lex);
+}
+
+void Parser::parse_oper_in(SyntTree * pst)
+{
+    get_lex(ifs, cur_lex, LEX_ID);
+    pst = pst->add_suc(NODE_OPER_IN, cur_lex.word());
+
+    get_lex(ifs, cur_lex, LEX_OPER_END);
+    get_lex(ifs, cur_lex);
+}
+
+void Parser::parse_oper_out(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_OPER_OUT);
+    
+    do {
+        parse_expr(pst);
+    } while (cur_lex.type() == LEX_OPER_COMMA);
+    if (cur_lex.type() != LEX_OPER_END) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_var(SyntTree * pst)

@@ -1,0 +1,3 @@
+program {
+    write a, b, 2;
+}
