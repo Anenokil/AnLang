@@ -27,7 +27,7 @@
 <statement> ::= <scope> | <declaration> | <assign> | <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write>
     <declaration> ::= <type> <decl_id> {"," <decl_id>} ";"
         <decl_id> ::= <id> ["=" <expr>]
-    <assign> ::= <id> "=" <expr> ";"
+    <assign> ::= <id> <operator_ret> <expr> ";"
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
     <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<id> <operator_ret> <expr>] ")" <statement>
     <while> ::= "while" "(" <expr> ")" <statement>
