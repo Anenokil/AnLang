@@ -22,11 +22,12 @@
         <operator_ret> ::= <op_assign>
             <op_assign> ::= "="
 
-<declaration> ::= <type> <var> {"," <var>} ";"
-    <type> ::= "int" | "float" | "bool" | "str"
-    <var> ::= <id> ["=" <expr>]
+<type> ::= "int" | "float" | "bool" | "str"
 
-<statement> ::= <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write> | <declaration> | <scope> | (<expr> ";")
+<statement> ::= <scope> | <declaration> | <assign> | <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write>
+    <declaration> ::= <type> <var> {"," <var>} ";"
+        <var> ::= <id> ["=" <expr>]
+    <assign> ::= <id> "=" <expr> ";"
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
     <for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
     <while> ::= "while" "(" <expr> ")" <statement>
