@@ -199,6 +199,10 @@ void Parser::parse_statement(SyntTree * pst)
         parse_decl(pst);
     } else if (cur_lex.type() == LEX_ID) {
         parse_assign(pst);
+        if (cur_lex.type() != LEX_OPER_END) {
+            err();
+        }
+        get_lex(ifs, cur_lex);
     } else if (cur_lex.type() == LEX_IF) {
         parse_if(pst);
     } else if (cur_lex.type() == LEX_FOR) {
@@ -276,13 +280,11 @@ void Parser::parse_assign(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_ASSIGN, cur_lex.word());
 
-    get_lex(ifs, cur_lex, LEX_OPER_2_RET);
-    get_lex(ifs, cur_lex);
-    parse_expr(pst);
-    if (cur_lex.type() != LEX_OPER_END) {
-        err();
-    }
-    get_lex(ifs, cur_lex);
+    do {
+        get_lex(ifs, cur_lex, LEX_OPER_2_RET);
+        get_lex(ifs, cur_lex);
+        parse_expr(pst);
+    } while (cur_lex.type() == LEX_OPER_COMMA);
 }
 
 void Parser::parse_if(SyntTree * pst)
@@ -310,6 +312,7 @@ void Parser::parse_for(SyntTree * pst)
     /*pst = pst->add_suc(NODE_FOR);
 
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    get_lex(ifs, cur_lex);
     parse_for_init(pst);
     if (cur_lex.type() != LEX_OPER_END) {
         err();
@@ -320,7 +323,7 @@ void Parser::parse_for(SyntTree * pst)
         err();
     }
     get_lex(ifs, cur_lex);
-    parse_expr(pst);
+    parse_assign(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         err();
     }
@@ -330,6 +333,11 @@ void Parser::parse_for(SyntTree * pst)
 
 void Parser::parse_for_init(SyntTree * pst)
 {
+    /*if (cur_lex.type() == LEX_TYPE) {
+        parse_decl(pst);
+    } else if (cur_lex.type() == LEX_ID) {
+        parse_assign(pst);
+    }*/
 }
 
 void Parser::parse_while(SyntTree * pst)
