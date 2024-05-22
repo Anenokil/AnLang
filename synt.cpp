@@ -197,6 +197,10 @@ void Parser::parse_statement(SyntTree * pst)
         parse_scope(pst);
     } else if (cur_lex.type() == LEX_TYPE) {
         parse_decl(pst);
+        if (cur_lex.type() != LEX_OPER_END) {
+            err();
+        }
+        get_lex(ifs, cur_lex);
     } else if (cur_lex.type() == LEX_ID) {
         parse_assign(pst);
         if (cur_lex.type() != LEX_OPER_END) {
@@ -230,10 +234,6 @@ void Parser::parse_decl(SyntTree * pst)
         get_lex(ifs, cur_lex, LEX_ID);
         parse_decl_id(pst);
     } while (cur_lex.type() == LEX_OPER_COMMA);
-    if (cur_lex.type() != LEX_OPER_END) {
-        err();
-    }
-    get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_decl_id(SyntTree * pst)
