@@ -203,17 +203,41 @@ void Parser::parse_scope(SyntTree * pst)
 
 void Parser::parse_statement(SyntTree * pst)
 {
-    //pst = pst->add_suc(NODE_STATEMENT);
-
     if (cur_lex.type() == LEX_SCOPE_L) {
         parse_scope(pst);
     } else if (cur_lex.type() == LEX_TYPE) {
         parse_decl(pst);
+    } else if (cur_lex.type() == LEX_VAR) {
+        parse_assign(pst);
     } else if (cur_lex.type() == LEX_IF) {
         parse_if(pst);
-    } else {
+    } else if (cur_lex.type() == LEX_FOR) {
         //
+    } else if (cur_lex.type() == LEX_WHILE) {
+        //
+    } else if (cur_lex.type() == LEX_UNTIL) {
+        //
+    } else if (cur_lex.type() == LEX_OPER_LOOP) {
+        //
+    } else if (cur_lex.type() == LEX_OPER_IN) {
+        //
+    } else if (cur_lex.type() == LEX_OPER_OUT) {
+        //
+    } else {
+        err();
     }
+}
+
+void Parser::parse_assign(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_ASSIGN, cur_lex.word());
+
+    get_lex(ifs, cur_lex, LEX_OPER_2_RET);
+    parse_expr(pst);
+    if (cur_lex.type() != LEX_OPER_END) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
 }
 
 void Parser::parse_if(SyntTree * pst)

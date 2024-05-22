@@ -8,16 +8,16 @@
 #include "lex.h"
 
 enum NodeType {
-    NODE_TMP,
+    NODE_TMP, // initial temporary value
     NODE_BEGIN,
     NODE_SCOPE,
     NODE_DECL,
+    NODE_ASSIGN,
     NODE_OPER_LOOP,
     NODE_OPER_IN,
     NODE_OPER_OUT,
     NODE_OPER_2,
     NODE_OPERAND,
-    NODE_ASSIGN,
     NODE_TYPE,
     NODE_VAR,
     NODE_VAR_INIT,
@@ -74,8 +74,9 @@ private:
     void parse_program();
     void parse_scope(SyntTree * pst);
     void parse_statement(SyntTree * pst);
-    void parse_if(SyntTree * pst);
     void parse_decl(SyntTree * pst);
+    void parse_assign(SyntTree * pst);
+    void parse_if(SyntTree * pst);
     void parse_var(SyntTree * pst);
     void parse_var_init(SyntTree * pst);
     void parse_expr(SyntTree * pst);
