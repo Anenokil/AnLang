@@ -13,30 +13,30 @@
     <const_str> ::= <quot> {<str_quant>} <quot>
         <str_quant> ::= any_ASCII_character_except_quot
 
-<expr> ::= (<id> [<operator> <expr>]) | (<const> [<operator_noret> <expr>]) | ("(" <expr> ")")
-    <operator> ::= <operator_noret> | <operator_ret>
-        <operator_noret> ::= <op_arithm> | <op_logic> | <op_cmp>
+<expr> ::= (<id> [<operator> <expr>]) | (<const> [<oper_noret> <expr>]) | ("(" <expr> ")")
+    <operator> ::= <oper_noret> | <oper_ret>
+        <oper_noret> ::= <op_arithm> | <op_logic> | <op_cmp>
             <op_arithm> ::= "+" | "-" | "*" | "/" | "%"
             <op_logic> ::= "+" | "*" | "~"
             <op_cmp> ::= "==" | "!=" | ">" | ">=" | "<" | "<="
-        <operator_ret> ::= <op_assign>
+        <oper_ret> ::= <op_assign>
             <op_assign> ::= "="
 
 <type> ::= "int" | "float" | "bool" | "str"
 
-<statement> ::= <scope> | (<declaration> ";") | (<assign> ";") | <if> | <for> | <while> | <until> | <break> | <continue> | <read> | <write>
-    <declaration> ::= <type> <decl_id> {"," <decl_id>}
+<statement> ::= <scope> | (<declare> ";") | (<assign> ";") | <if> | <for> | <while> | <until> | <break> | <continue> | <input> | <output>
+    <declare> ::= <type> <decl_id> {"," <decl_id>}
         <decl_id> ::= <id> ["=" <expr>]
-    <assign> ::= <id> <operator_ret> <expr> ["," <assign>]
+    <assign> ::= <id> <oper_ret> <expr> ["," <assign>]
     <if> ::= "if" "(" <expr> ")" <statement> ["else" <statement>]
     <for> ::= "for" "(" [<for_init>] ";" [<expr>] ";" [<assign>] ")" <statement>
-        <for_init> ::= <declaration> | <assign>
+        <for_init> ::= <declare> | <assign>
     <while> ::= "while" "(" <expr> ")" <statement>
     <until> ::= "do" <statement> "until" "(" <expr> ")" ";"
     <break> ::= "break" ";"
     <continue> ::= "continue" ";"
-    <read> ::= "read" <id> ";"
-    <write> ::= "write" <expr> {"," <expr>} ";"
+    <input> ::= "input" <id> ";"
+    <output> ::= "output" <expr> {"," <expr>} ";"
 
 <scope> ::= "{" {<statement>} "}"
 
