@@ -26,6 +26,8 @@ enum NodeType {
     NODE_OPER_IN,
     NODE_OPER_OUT,
     NODE_EXPR,
+    NODE_OPERAND,
+    NODE_OPER_2,
 };
 
 class SyntTree
@@ -82,6 +84,7 @@ private:
     void parse_oper_in(SyntTree * pst);
     void parse_oper_out(SyntTree * pst);
     void parse_expr(SyntTree * pst);
+    void parse_expr2(SyntTree * pst);
 
 public:
     Parser(std::ifstream & ifs);

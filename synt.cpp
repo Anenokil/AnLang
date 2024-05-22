@@ -118,6 +118,10 @@ std::string SyntTree::get_typename() const
         return "OPER_OUT";
     } else if (type == NODE_EXPR) {
         return "EXPR";
+    } else if (type == NODE_OPER_2) {
+        return "OPER_2";
+    } else if (type == NODE_OPERAND) {
+        return "OPERAND";
     } else {
         return "???";
     }
@@ -257,16 +261,8 @@ void Parser::parse_decl_id(SyntTree * pst)
 void Parser::parse_decl_init(SyntTree * pst)
 {
     get_lex();
-    pst = pst->add_suc(NODE_DECL_INIT, cur_lex.word());
-    if (cur_lex.type() == LEX_ID) {
-        //
-    } else if (cur_lex.type() == LEX_CONST) {
-        //
-    } else {
-        err();
-    }
+    parse_expr(pst);
 
-    get_lex();
     if (cur_lex.type() == LEX_OPER_COMMA) {
         // return;
     } else if (cur_lex.type() == LEX_OPER_END) {
@@ -410,13 +406,50 @@ void Parser::parse_oper_out(SyntTree * pst)
 
 void Parser::parse_expr(SyntTree * pst)
 {
-    /**/pst = pst->add_suc(NODE_EXPR, cur_lex.word());
-    if (cur_lex.type() != LEX_ID && cur_lex.type() != LEX_CONST) {
+    pst = pst->add_suc(NODE_EXPR);
+
+    parse_expr2(pst);
+}
+
+void Parser::parse_expr2(SyntTree * pst)
+{
+    if (cur_lex.type() == LEX_ID) {
+        pst->add_suc(NODE_OPERAND, cur_lex.word());
+        get_lex();
+        if (cur_lex.type() == LEX_OPER_2_RET || cur_lex.type() == LEX_OPER_2_NORET) {
+            pst->add_suc(NODE_OPER_2, cur_lex.word());
+            get_lex();
+            parse_expr2(pst);
+        } else {
+            // return;
+        }
+    } else if (cur_lex.type() == LEX_CONST) {
+        pst->add_suc(NODE_OPERAND, cur_lex.word());
+        get_lex();
+        if (cur_lex.type() == LEX_OPER_2_NORET) {
+            pst->add_suc(NODE_OPER_2, cur_lex.word());
+            get_lex();
+            parse_expr2(pst);
+        } else {
+            // return;
+        }
+    } else if (cur_lex.type() == LEX_PARENTHESIS_L) {
+        get_lex();
+        parse_expr(pst);
+        if (cur_lex.type() != LEX_PARENTHESIS_R) {
+            err();
+        }
+        get_lex();
+        if (cur_lex.type() == LEX_OPER_2_NORET) {
+            pst->add_suc(NODE_OPER_2, cur_lex.word());
+            get_lex();
+            parse_expr2(pst);
+        } else {
+            // return;
+        }
+    } else {
         err();
     }
-
-    get_lex();
-    // return;
 }
 
 Parser::Parser(std::ifstream & ifs): ifs(ifs), tid(), st(NODE_BEGIN), cur_lex()
