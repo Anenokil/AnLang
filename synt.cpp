@@ -277,6 +277,7 @@ void Parser::parse_assign(SyntTree * pst)
     pst = pst->add_suc(NODE_ASSIGN, cur_lex.word());
 
     get_lex(ifs, cur_lex, LEX_OPER_2_RET);
+    get_lex(ifs, cur_lex);
     parse_expr(pst);
     if (cur_lex.type() != LEX_OPER_END) {
         err();
@@ -289,6 +290,7 @@ void Parser::parse_if(SyntTree * pst)
     pst = pst->add_suc(NODE_IF);
 
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    get_lex(ifs, cur_lex);
     parse_expr(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         err();
@@ -305,7 +307,6 @@ void Parser::parse_if(SyntTree * pst)
 
 void Parser::parse_for(SyntTree * pst)
 {
-    //<for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
     /*pst = pst->add_suc(NODE_FOR);
 
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
@@ -313,16 +314,22 @@ void Parser::parse_for(SyntTree * pst)
     if (cur_lex.type() != LEX_OPER_END) {
         err();
     }
+    get_lex(ifs, cur_lex);
     parse_expr(pst);
-    if (cur_lex.type() == LEX_ELSE) {
-        get_lex(ifs, cur_lex);
-        parse_statement(pst);
-    } */
+    if (cur_lex.type() != LEX_OPER_END) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
+    parse_expr(pst);
+    if (cur_lex.type() != LEX_PARENTHESIS_R) {
+        err();
+    }
+    get_lex(ifs, cur_lex);
+    parse_statement(pst);*/
 }
 
 void Parser::parse_for_init(SyntTree * pst)
 {
-
 }
 
 void Parser::parse_while(SyntTree * pst)
@@ -330,6 +337,7 @@ void Parser::parse_while(SyntTree * pst)
     pst = pst->add_suc(NODE_WHILE);
 
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    get_lex(ifs, cur_lex);
     parse_expr(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         err();
@@ -348,6 +356,7 @@ void Parser::parse_until(SyntTree * pst)
         err();
     }
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
+    get_lex(ifs, cur_lex);
     parse_expr(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         err();
@@ -378,6 +387,7 @@ void Parser::parse_oper_out(SyntTree * pst)
     pst = pst->add_suc(NODE_OPER_OUT);
     
     do {
+        get_lex(ifs, cur_lex);
         parse_expr(pst);
     } while (cur_lex.type() == LEX_OPER_COMMA);
     if (cur_lex.type() != LEX_OPER_END) {
@@ -388,7 +398,6 @@ void Parser::parse_oper_out(SyntTree * pst)
 
 void Parser::parse_expr(SyntTree * pst)
 {
-    get_lex(ifs, cur_lex);
     /**/pst = pst->add_suc(NODE_EXPR, cur_lex.word());
     if (cur_lex.type() != LEX_ID && cur_lex.type() != LEX_CONST) {
         err();
