@@ -88,34 +88,16 @@ std::string SyntTree::get_typename() const
         return "BEGIN";
     } else if (type == NODE_SCOPE) {
         return "SCOPE";
-    } else if (type == NODE_OPER_LOOP) {
-        return "OPER_LOOP";
-    } else if (type == NODE_OPER_IN) {
-        return "READ";
-    } else if (type == NODE_OPER_OUT) {
-        return "WRITE";
-    } else if (type == NODE_OPERAND) {
-        return "OPERAND";
-    } else if (type == NODE_ASSIGN) {
-        return "ASSIGN";
     } else if (type == NODE_DECL) {
         return "DECL";
-    } else if (type == NODE_OPER_2) {
-        return "OPER_2";
-    } else if (type == NODE_TYPE) {
-        return "TYPE";
-    } else if (type == NODE_VAR) {
-        return "VAR";
-    } else if (type == NODE_VAR_INIT) {
-        return "VAR_INIT";
-    } else if (type == NODE_EXPR) {
-        return "EXPR";
+    } else if (type == NODE_DECL_ID) {
+        return "DECL_ID";
+    } else if (type == NODE_DECL_INIT) {
+        return "DECL_INIT";
+    } else if (type == NODE_ASSIGN) {
+        return "ASSIGN";
     } else if (type == NODE_IF) {
         return "IF";
-    } else if (type == NODE_COND) {
-        return "COND";
-    } else if (type == NODE_BODY) {
-        return "BODY";
     } else if (type == NODE_FOR) {
         return "FOR";
     } else if (type == NODE_FOR_INIT) {
@@ -128,6 +110,14 @@ std::string SyntTree::get_typename() const
         return "WHILE";
     } else if (type == NODE_UNTIL) {
         return "UNTIL";
+    } else if (type == NODE_OPER_LOOP) {
+        return "OPER_LOOP";
+    } else if (type == NODE_OPER_IN) {
+        return "OPER_IN";
+    } else if (type == NODE_OPER_OUT) {
+        return "OPER_OUT";
+    } else if (type == NODE_EXPR) {
+        return "EXPR";
     } else {
         return "???";
     }
@@ -234,12 +224,52 @@ void Parser::parse_decl(SyntTree * pst)
 
     do {
         get_lex(ifs, cur_lex, LEX_ID);
-        parse_var(pst);
+        parse_decl_id(pst);
     } while (cur_lex.type() == LEX_OPER_COMMA);
     if (cur_lex.type() != LEX_OPER_END) {
         err();
     }
     get_lex(ifs, cur_lex);
+}
+
+void Parser::parse_decl_id(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_DECL_ID, cur_lex.word());
+
+    tid.add(pst->predecessor->lex, pst->lex);
+
+    get_lex(ifs, cur_lex);
+    if (cur_lex.type() == LEX_OPER_2_RET) {
+        parse_decl_init(pst);
+    } else if(cur_lex.type() == LEX_OPER_COMMA) {
+        // return;
+    } else if (cur_lex.type() == LEX_OPER_END) {
+        // return;
+    } else {
+        err();
+    }
+}
+
+void Parser::parse_decl_init(SyntTree * pst)
+{
+    get_lex(ifs, cur_lex);
+    pst = pst->add_suc(NODE_DECL_INIT, cur_lex.word());
+    if (cur_lex.type() == LEX_ID) {
+        //
+    } else if (cur_lex.type() == LEX_CONST) {
+        //
+    } else {
+        err();
+    }
+
+    get_lex(ifs, cur_lex);
+    if (cur_lex.type() == LEX_OPER_COMMA) {
+        // return;
+    } else if (cur_lex.type() == LEX_OPER_END) {
+        // return;
+    } else {
+        err();
+    }
 }
 
 void Parser::parse_assign(SyntTree * pst)
@@ -275,21 +305,24 @@ void Parser::parse_if(SyntTree * pst)
 
 void Parser::parse_for(SyntTree * pst)
 {
+    //<for> ::= "for" "(" [[<type>] <expr>] ";" [<expr>] ";" [<expr>] ")" <statement>
     /*pst = pst->add_suc(NODE_FOR);
 
     get_lex(ifs, cur_lex, LEX_PARENTHESIS_L);
-    parse_expr(pst);
-    if (cur_lex.type() != LEX_PARENTHESIS_R) {
+    parse_for_init(pst);
+    if (cur_lex.type() != LEX_OPER_END) {
         err();
     }
-    get_lex(ifs, cur_lex);
-    parse_statement(pst);
+    parse_expr(pst);
     if (cur_lex.type() == LEX_ELSE) {
         get_lex(ifs, cur_lex);
         parse_statement(pst);
-    } else {
-        // return;
-    }*/
+    } */
+}
+
+void Parser::parse_for_init(SyntTree * pst)
+{
+
 }
 
 void Parser::parse_while(SyntTree * pst)
@@ -351,46 +384,6 @@ void Parser::parse_oper_out(SyntTree * pst)
         err();
     }
     get_lex(ifs, cur_lex);
-}
-
-void Parser::parse_var(SyntTree * pst)
-{
-    pst = pst->add_suc(NODE_VAR, cur_lex.word());
-
-    tid.add(pst->predecessor->lex, pst->lex);
-
-    get_lex(ifs, cur_lex);
-    if (cur_lex.type() == LEX_OPER_2_RET) {
-        parse_var_init(pst);
-    } else if(cur_lex.type() == LEX_OPER_COMMA) {
-        // return;
-    } else if (cur_lex.type() == LEX_OPER_END) {
-        // return;
-    } else {
-        err();
-    }
-}
-
-void Parser::parse_var_init(SyntTree * pst)
-{
-    get_lex(ifs, cur_lex);
-    pst = pst->add_suc(NODE_VAR_INIT, cur_lex.word());
-    if (cur_lex.type() == LEX_ID) {
-        //
-    } else if (cur_lex.type() == LEX_CONST) {
-        //
-    } else {
-        err();
-    }
-
-    get_lex(ifs, cur_lex);
-    if (cur_lex.type() == LEX_OPER_COMMA) {
-        // return;
-    } else if (cur_lex.type() == LEX_OPER_END) {
-        // return;
-    } else {
-        err();
-    }
 }
 
 void Parser::parse_expr(SyntTree * pst)

@@ -12,25 +12,20 @@ enum NodeType {
     NODE_BEGIN,
     NODE_SCOPE,
     NODE_DECL,
+    NODE_DECL_ID,
+    NODE_DECL_INIT,
     NODE_ASSIGN,
-    NODE_OPER_LOOP,
-    NODE_OPER_IN,
-    NODE_OPER_OUT,
-    NODE_OPER_2,
-    NODE_OPERAND,
-    NODE_TYPE,
-    NODE_VAR,
-    NODE_VAR_INIT,
-    NODE_EXPR,
     NODE_IF,
     NODE_FOR,
-    NODE_WHILE,
-    NODE_UNTIL,
-    NODE_COND,
-    NODE_BODY,
     NODE_FOR_INIT,
     NODE_FOR_COND,
     NODE_FOR_ITER,
+    NODE_WHILE,
+    NODE_UNTIL,
+    NODE_OPER_LOOP,
+    NODE_OPER_IN,
+    NODE_OPER_OUT,
+    NODE_EXPR,
 };
 
 class SyntTree
@@ -75,16 +70,17 @@ private:
     void parse_scope(SyntTree * pst);
     void parse_statement(SyntTree * pst);
     void parse_decl(SyntTree * pst);
+    void parse_decl_id(SyntTree * pst);
+    void parse_decl_init(SyntTree * pst);
     void parse_assign(SyntTree * pst);
     void parse_if(SyntTree * pst);
     void parse_for(SyntTree * pst);
+    void parse_for_init(SyntTree * pst);
     void parse_while(SyntTree * pst);
     void parse_until(SyntTree * pst);
     void parse_oper_loop(SyntTree * pst);
     void parse_oper_in(SyntTree * pst);
     void parse_oper_out(SyntTree * pst);
-    void parse_var(SyntTree * pst);
-    void parse_var_init(SyntTree * pst);
     void parse_expr(SyntTree * pst);
 
 public:
