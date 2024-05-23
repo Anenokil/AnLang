@@ -66,6 +66,7 @@ private:
 
     void err();
     void err(LexType exp);
+    void err(std::string const & cause);
     bool get_lex();
     bool get_lex(LexType req_type);
 
@@ -85,7 +86,7 @@ private:
     void parse_oper_in(SyntTree * pst);
     void parse_oper_out(SyntTree * pst);
     void parse_expr(SyntTree * pst);
-    void parse_expr2(SyntTree * pst);
+    void parse_expr2(SyntTree * pst, bool is_lval);
 
 public:
     Parser(std::ifstream & ifs);

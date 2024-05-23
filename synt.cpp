@@ -157,6 +157,12 @@ void Parser::err(LexType exp)
             cur_lex.word() + "'.");
 }
 
+void Parser::err(std::string const & cause)
+{
+    throw std::runtime_error(std::to_string(cur_lex.row()) + " line, " + std::to_string(cur_lex.col()) +
+            " column: " + cause + ": '" + cur_lex.word() + "'.");
+}
+
 bool Parser::get_lex()
 {
     return sc.get_lex(cur_lex, true);
@@ -408,47 +414,41 @@ void Parser::parse_expr(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_EXPR);
 
-    parse_expr2(pst);
+    parse_expr2(pst, true);
 }
 
-void Parser::parse_expr2(SyntTree * pst)
+void Parser::parse_expr2(SyntTree * pst, bool is_lval)
 {
     if (cur_lex.type() == LEX_ID) {
         pst->add_suc(NODE_OPERAND, cur_lex.word());
-        get_lex();
-        if (cur_lex.type() == LEX_OPER_2_RET || cur_lex.type() == LEX_OPER_2_NORET) {
-            pst->add_suc(NODE_OPER_2, cur_lex.word());
-            get_lex();
-            parse_expr2(pst);
-        } else {
-            // return;
-        }
-    } else if (cur_lex.type() == LEX_CONST) {
+    } else if (cur_lex.type() == LEX_INT_CONST || cur_lex.type() == LEX_FLOAT_CONST || cur_lex.type() == LEX_BOOL_CONST || cur_lex.type() == LEX_STR_CONST) {
+        is_lval = false;
         pst->add_suc(NODE_OPERAND, cur_lex.word());
-        get_lex();
-        if (cur_lex.type() == LEX_OPER_2_NORET) {
-            pst->add_suc(NODE_OPER_2, cur_lex.word());
-            get_lex();
-            parse_expr2(pst);
-        } else {
-            // return;
-        }
     } else if (cur_lex.type() == LEX_PARENTHESIS_L) {
+        is_lval = false;
         get_lex();
         parse_expr(pst);
         if (cur_lex.type() != LEX_PARENTHESIS_R) {
             err();
         }
-        get_lex();
-        if (cur_lex.type() == LEX_OPER_2_NORET) {
-            pst->add_suc(NODE_OPER_2, cur_lex.word());
-            get_lex();
-            parse_expr2(pst);
-        } else {
-            // return;
-        }
     } else {
         err();
+    }
+
+    get_lex();
+    if (cur_lex.type() == LEX_OPER_2_RET) {
+        if (!is_lval) {
+            err("Invalid left operand");
+        }
+        pst->add_suc(NODE_OPER_2, cur_lex.word());
+        get_lex();
+        parse_expr2(pst, true);
+    } else if (cur_lex.type() == LEX_OPER_2_NORET) {
+        pst->add_suc(NODE_OPER_2, cur_lex.word());
+        get_lex();
+        parse_expr2(pst, false);
+    } else {
+        // return;
     }
 }
 

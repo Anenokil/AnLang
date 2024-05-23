@@ -14,9 +14,9 @@ enum FlagVal {
     FL_ERROR,
 };
 
-bool _is_id(std::string const & lex)
+bool _is_id(std::string const & word)
 {
-    for (char c: lex) {
+    for (char c: word) {
         if (!is_id_quant(c)) {
             return false;
         }
@@ -24,10 +24,20 @@ bool _is_id(std::string const & lex)
     return true;
 }
 
-bool _is_num_const(std::string const & lex)
+bool _is_int_const(std::string const & word)
+{
+    for (char c: word) {
+        if (!std::isdigit(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool _is_float_const(std::string const & word)
 {
     bool has_point = false;
-    for (char c: lex) {
+    for (char c: word) {
         if (is_point(c)) {
             if (has_point) {
                 return false;
@@ -40,9 +50,14 @@ bool _is_num_const(std::string const & lex)
     return true;
 }
 
-bool _is_str_const(std::string const & lex)
+bool _is_bool_const(std::string const & word)
 {
-    return lex.length() >= 2 && lex[0] == '"' && lex[lex.length() - 1] == '"';
+    return word == rw::BOOL_TRUE || word == rw::BOOL_FALSE;
+}
+
+bool _is_str_const(std::string const & word)
+{
+    return word.length() >= 2 && word[0] == '"' && word[word.length() - 1] == '"';
 }
 
 Lex::Lex(std::string const & word, LexType type, unsigned row, unsigned col): word_(word), type_(type), row_(row), col_(col)
@@ -73,7 +88,10 @@ LexType Lex::define_lex_type()
     if (word_ == rw::PAR_BEG) return LEX_PARENTHESIS_L;
     if (word_ == rw::PAR_END) return LEX_PARENTHESIS_R;
     if (word_ == rw::TYPE_INT || word_ == rw::TYPE_FLOAT || word_ == rw::TYPE_BOOL || word_ == rw::TYPE_STR) return LEX_TYPE;
-    if (word_ == rw::BOOL_TRUE || word_ == rw::BOOL_FALSE || _is_num_const(word_) || _is_str_const(word_)) return LEX_CONST;
+    if (_is_int_const(word_)) return LEX_INT_CONST;
+    if (_is_float_const(word_)) return LEX_FLOAT_CONST;
+    if (_is_bool_const(word_)) return LEX_BOOL_CONST;
+    if (_is_str_const(word_)) return LEX_STR_CONST;
     if (_is_id(word_)) return LEX_ID;
     throw std::runtime_error(std::to_string(row_) + " line, " + std::to_string(col_) +
             " column: Unknown lexeme: '" + word_ + "'.");
