@@ -1,0 +1,28 @@
+program {
+    int a,b ,c;
+    if (a > b) {
+        if (a > c) {
+            write a;
+        } else if (a == c) {
+            write a, c;
+        } else {
+            write c;
+        }
+    } else if (a == b) {
+        if (a > c) {
+            write a, b;
+        } else if (a == c) {
+            write a, b, c;
+        } else {
+            write c;
+        }
+    } else {
+        if (a > c) {
+            write b;
+        } else if (a == c) {
+
+        } else {
+
+        }
+    }
+}

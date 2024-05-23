@@ -1,0 +1,4 @@
+program {
+    int b, c;
+    int a = b + c = 2;
+}

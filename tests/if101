@@ -1,0 +1,3 @@
+program {
+    if (true) if (2 > 1) { int x; }
+}
