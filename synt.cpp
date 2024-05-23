@@ -159,12 +159,12 @@ void Parser::err(LexType exp)
 
 bool Parser::get_lex()
 {
-    return ::get_lex(ifs, cur_lex, true);
+    return sc.get_lex(cur_lex, true);
 }
 
 bool Parser::get_lex(LexType req_type)
 {
-    bool ret = ::get_lex(ifs, cur_lex, true);
+    bool ret = sc.get_lex(cur_lex, true);
     if (cur_lex.type() != req_type) {
         err(req_type);
     }
@@ -452,7 +452,7 @@ void Parser::parse_expr2(SyntTree * pst)
     }
 }
 
-Parser::Parser(std::ifstream & ifs): ifs(ifs), tid(), st(NODE_BEGIN), cur_lex()
+Parser::Parser(std::ifstream & ifs): ifs(ifs), tid(), st(NODE_BEGIN), cur_lex(), sc(ifs)
 {
     parse_program();
 }

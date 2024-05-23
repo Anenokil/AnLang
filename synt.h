@@ -62,6 +62,7 @@ private:
     TID tid{};
     SyntTree st{};
     Lex cur_lex{};
+    Scanner sc;
 
     void err();
     void err(LexType exp);

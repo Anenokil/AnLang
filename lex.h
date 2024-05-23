@@ -39,28 +39,33 @@ private:
     unsigned row_{};
     unsigned col_{};
 
-    /* the function receives a lexeme and returns its type */
+    Lex(std::string const & word, LexType type, unsigned row, unsigned col);
     LexType define_lex_type(std::string const & lex);
     
 public:
     Lex();
     Lex(std::string const & str, unsigned row, unsigned col);
-    Lex(unsigned row, unsigned col); // EOF
+    static Lex eof(unsigned row, unsigned col);
     std::string word() const;
     LexType type() const;
     unsigned row() const;
     unsigned col() const;
 };
 
-/*class Scanner
+class Scanner
 {
 private:
+    std::ifstream & ifs_;
+    Lex lex_{};
+    char c_{};
+    unsigned row_{};
+    unsigned col_{};
 
-};*/
+    void iter();
 
-/* the function gets one lexeme from file;
- * returns true if OK and false if an error appears;
- * if to_throw sets on true, throws an error instead of RET_ERR returns */
-bool get_lex(std::ifstream & ifs, Lex & lex, bool to_throw = true);
+public:
+    explicit Scanner(std::ifstream & ifs);
+    bool get_lex(Lex & lex, bool to_throw = true);
+};
 
 #endif

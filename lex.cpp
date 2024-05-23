@@ -45,6 +45,10 @@ bool _is_str_const(std::string const & lex)
     return lex.length() >= 2 && lex[0] == '"' && lex[lex.length() - 1] == '"';
 }
 
+Lex::Lex(std::string const & word, LexType type, unsigned row, unsigned col): word_(word), type_(type), row_(row), col_(col)
+{}
+
+/* the function receives a lexeme and returns its type */
 LexType Lex::define_lex_type(std::string const & lex)
 {
     if (lex == "") return LEX_UNKNOWN;
@@ -80,8 +84,10 @@ Lex::Lex(): word_(""), type_(LEX_TMP), row_(0), col_(0)
 Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), type_(define_lex_type(str)), row_(row), col_(col)
 {}
 
-Lex::Lex(unsigned row, unsigned col): word_(""), type_(LEX_EOF), row_(row), col_(col)
-{}
+Lex Lex::eof(unsigned row, unsigned col)
+{
+    return Lex("", LEX_EOF, row, col);
+}
 
 std::string Lex::word() const
 {
@@ -151,65 +157,71 @@ bool _has_correct_flag(char c, FlagVal & flag)
     return false; /* unknown flag */
 }
 
-bool get_lex(std::ifstream & ifs, Lex & lex, bool to_throw)
+void Scanner::iter()
 {
-    static unsigned row = 1;
-    static unsigned col = 0;
-    static char c = ' ';
-    static auto iter = [&ifs](){
-        c = ifs.get();
-        if (c == '\n') {
-            col = 0;
-            ++row;
-        } else {
-            ++col;
-        }
-    };
+    c_ = ifs_.get();
+    if (c_ == '\n') {
+        col_ = 0;
+        ++row_;
+    } else {
+        ++col_;
+    }
+}
 
+Scanner::Scanner(std::ifstream & ifs): ifs_(ifs), row_(1), col_(0), c_(' ')
+{}
+
+/* the function gets one lexeme from file;
+* returns true if OK and false if an error appears;
+* if to_throw sets on true, throws an error instead of RET_ERR returns */
+bool Scanner::get_lex(Lex & lex, bool to_throw)
+{
     /* read space characters */
-    while (!ifs.eof() && (std::isspace(c) || is_comment_beg(c))) {
-        if (is_comment_beg(c)) {
+    while (!ifs_.eof() && (std::isspace(c_) || is_comment_beg(c_))) {
+        if (is_comment_beg(c_)) {
             iter();
-            while (!ifs.eof() && !is_comment_end(c)) {
+            while (!ifs_.eof() && !is_comment_end(c_)) {
                 iter();
             }
         }
         iter();
     }
-    if (ifs.eof()) {
-        lex = Lex(row, col);
+    if (ifs_.eof()) {
+        lex = Lex::eof(row_, col_);
         return true;
     }
 
     /* read the first non-space character */
-    FlagVal flag = _get_flag(c);
+    FlagVal flag = _get_flag(c_);
     if (flag == FL_ERROR) {
         if (to_throw) {
-            throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
+            throw std::runtime_error(std::to_string(row_) + " line, " + std::to_string(col_) +
+                    " column: Unexpected character '" + std::string(1, c_) + "'.");
         }
-        lex = Lex("", row, col);
+        lex = Lex("", row_, col_);
         return false;
     }
-    unsigned const row_lex = row;
-    unsigned const col_lex = col;
+    unsigned const row_lex = row_;
+    unsigned const col_lex = col_;
 
     /* read following characters */
     std::string res = "";
     do {
-        res += c;
+        res += c_;
         iter();
-    } while (!ifs.eof() && _has_correct_flag(c, flag));
+    } while (!ifs_.eof() && _has_correct_flag(c_, flag));
     if (flag == FL_ERROR) {
         if (to_throw) {
-            throw std::runtime_error(std::to_string(row) + " line, " + std::to_string(col) + " column: Unexpected character '" + std::string(1, c) + "'.");
+            throw std::runtime_error(std::to_string(row_) + " line, " + std::to_string(col_) +
+                    " column: Unexpected character '" + std::string(1, c_) + "'.");
         }
-        lex = Lex("", row, col);
+        lex = Lex("", row_, col_);
         return false;
     }
 
     /* return a result */
-    if (ifs.eof()) {
-        lex = Lex(row_lex, col_lex);
+    if (ifs_.eof()) {
+        lex = Lex::eof(row_lex, col_lex);
     }
     lex = Lex(res, row_lex, col_lex);
     return true;
