@@ -1,3 +1,4 @@
 program {
+    int a, b;
     write a, b, 2;
 }

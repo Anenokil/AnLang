@@ -40,6 +40,7 @@ private:
     std::vector<TIDLine> lines_{};
 
 public:
+    int find(std::string const & name) const;
     bool add(std::string const & type = "", std::string const & name = "", std::string const & init = "");
     bool set_init(std::string const & name, std::string const & init);
     friend std::ostream & operator<<(std::ostream & os, TID const & obj);

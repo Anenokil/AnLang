@@ -250,7 +250,10 @@ void Parser::parse_decl_id(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_DECL_ID, cur_lex.word());
 
-    tid.add(pst->predecessor->lex, pst->lex);
+    bool ret = tid.add(pst->predecessor->lex, pst->lex);
+    if (!ret) {
+        err("The variable is re-declared");
+    }
 
     get_lex();
     if (cur_lex.type() == LEX_OPER_2_RET) {
@@ -281,6 +284,10 @@ void Parser::parse_decl_init(SyntTree * pst)
 void Parser::parse_assign(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_ASSIGN, cur_lex.word());
+
+    if (tid.find(cur_lex.word()) == -1) {
+        err("The variable is not declared");
+    }
 
     do {
         get_lex(LEX_OPER_2_RET);
@@ -392,6 +399,10 @@ void Parser::parse_oper_in(SyntTree * pst)
     get_lex(LEX_ID);
     pst = pst->add_suc(NODE_OPER_IN, cur_lex.word());
 
+    if (tid.find(cur_lex.word()) == -1) {
+        err("The variable is not declared");
+    }
+
     get_lex(LEX_OPER_END);
     get_lex();
 }
@@ -420,6 +431,9 @@ void Parser::parse_expr(SyntTree * pst)
 void Parser::parse_expr2(SyntTree * pst, bool is_lval)
 {
     if (cur_lex.type() == LEX_ID) {
+        if (tid.find(cur_lex.word()) == -1) {
+            err("The variable is not declared");
+        }
         pst->add_suc(NODE_OPERAND, cur_lex.word());
     } else if (cur_lex.type() == LEX_INT_CONST || cur_lex.type() == LEX_FLOAT_CONST || cur_lex.type() == LEX_BOOL_CONST || cur_lex.type() == LEX_STR_CONST) {
         is_lval = false;

@@ -81,14 +81,25 @@ std::ostream & TID::TIDLine::print(std::ostream & os) const
     return os;
 }
 
+int TID::find(std::string const & name) const
+{
+    TIDLine tmp("", name, "");
+    auto it = std::find(lines_.begin(), lines_.end(), tmp);
+    if (it == lines_.end()) {
+        return -1;
+    } else {
+        return it - lines_.begin();
+    }
+}
+
 bool TID::add(std::string const & type, std::string const & name, std::string const & init)
 {
     TIDLine new_line(type, name, init);
-    if (std::find(lines_.begin(), lines_.end(), new_line) != lines_.end()) {
-        return false;
-    } else {
+    if (std::find(lines_.begin(), lines_.end(), new_line) == lines_.end()) {
         lines_.push_back(new_line);
         return true;
+    } else {
+        return false;
     }
 }
 
@@ -96,11 +107,11 @@ bool TID::set_init(std::string const & name, std::string const & init)
 {
     TIDLine new_line("", name, "");
     auto it = std::find(lines_.begin(), lines_.end(), new_line);
-    if (it != lines_.end()) {
+    if (it == lines_.end()) {
+        return false;
+    } else {
         it->set_init(init);
         return true;
-    } else {
-        return false;
     }
 }
 
