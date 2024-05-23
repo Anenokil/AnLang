@@ -33,7 +33,7 @@ bool _is_num_const(std::string const & lex)
                 return false;
             }
             has_point = true;
-        } if (!std::isdigit(c)) {
+        } else if (!std::isdigit(c)) {
             return false;
         }
     }
