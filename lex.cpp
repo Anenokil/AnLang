@@ -100,8 +100,10 @@ LexType Lex::define_lex_type()
 Lex::Lex(): word_(""), type_(LEX_TMP), row_(0), col_(0)
 {}
 
-Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), type_(define_lex_type()), row_(row), col_(col)
-{}
+Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), row_(row), col_(col)
+{
+    type_ = define_lex_type();
+}
 
 Lex Lex::eof(unsigned row, unsigned col)
 {
@@ -169,7 +171,7 @@ bool _has_correct_flag(char c, FlagVal & flag)
         return false;
     } else if (flag == FL_SPEC) {
         flag = FL_SPEC_END;
-        return is_spec_end(c);
+        return c == '=';
     } else if (flag == FL_SPEC_END) {
         return false;
     }
