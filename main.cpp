@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "tid.h"
-#include "synt.h"
+#include "parser.h"
 
 int main()
 {

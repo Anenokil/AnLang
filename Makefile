@@ -1,7 +1,7 @@
 CC = g++
 CCFLAGS = -O0 -g
 MAIN = main
-MODULES = reserved chtype tid lex synt
+MODULES = reserved chtype tid lex synt_tree parser
 TARGET = r
 
 all: $(TARGET)
