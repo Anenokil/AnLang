@@ -213,7 +213,7 @@ void Parser::parse_statement(SyntTree * pst)
             err();
         }
         get_lex();
-    } else if (cur_lex.type() == LEX_ID) {
+    } else if (cur_lex.type() == LEX_ID || is_oper_1(cur_lex.type())) {
         parse_assign(pst);
         if (cur_lex.type() != LEX_SEMICOLON) {
             err();
@@ -454,7 +454,13 @@ void Parser::parse_expr(SyntTree * pst)
 {
     pst = pst->add_suc(NODE_EXPR);
 
-    parse_expr2(pst, true);
+    if (is_oper_1(cur_lex.type())) {
+        pst->add_suc(NODE_OPERAND, cur_lex.word());
+        get_lex();
+        parse_expr2(pst, false);
+    } else {
+        parse_expr2(pst, true);
+    }
 }
 
 void Parser::parse_expr2(SyntTree * pst, bool is_lval)
