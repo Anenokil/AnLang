@@ -17,7 +17,7 @@
     <lrval> ::= <lval> | <rval>
         <lval> ::= <id>
         <rval> ::= <const> | ("(" <expr> ")") | (<oper_1> <lrval>)
-    <oper_1> ::= "-" | "~"
+    <oper_1> ::= "+" | "-" | "~"
     <oper_2_ret> ::= "="
     <oper_2_noret> ::= <op_arithm> | <op_logic> | <op_cmp>
         <op_arithm> ::= "+" | "-" | "*" | "/" | "%"
