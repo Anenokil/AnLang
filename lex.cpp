@@ -69,7 +69,8 @@ LexType Lex::define_lex_type()
     if (word_ == rw::BEGIN) return LEX_BEGIN;
     if (word_ == rw::OPER_COMMA) return LEX_OPER_COMMA;
     if (word_ == rw::OPER_END) return LEX_OPER_END;
-    if (word_ == rw::OPER_BREAK || word_ == rw::OPER_CONT) return LEX_OPER_LOOP;
+    if (word_ == rw::OPER_BREAK) return LEX_BREAK;
+    if (word_ == rw::OPER_CONT) return LEX_CONTINUE;
     if (word_ == rw::OPER_READ) return LEX_OPER_IN;
     if (word_ == rw::OPER_WRITE) return LEX_OPER_OUT;
     if (word_ == rw::OPER_ADD || word_ == rw::OPER_SUB || word_ == rw::OPER_MULT || word_ == rw::OPER_DIV ||

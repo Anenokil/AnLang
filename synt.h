@@ -22,7 +22,8 @@ enum NodeType {
     NODE_FOR_ITER,
     NODE_WHILE,
     NODE_UNTIL,
-    NODE_OPER_LOOP,
+    NODE_BREAK,
+    NODE_CONTINUE,
     NODE_OPER_IN,
     NODE_OPER_OUT,
     NODE_EXPR,
@@ -63,6 +64,7 @@ private:
     SyntTree st{};
     Lex cur_lex{};
     Scanner sc;
+    unsigned loop_depth{};
 
     void err();
     void err(LexType exp);
@@ -82,7 +84,8 @@ private:
     void parse_for_init(SyntTree * pst);
     void parse_while(SyntTree * pst);
     void parse_until(SyntTree * pst);
-    void parse_oper_loop(SyntTree * pst);
+    void parse_break(SyntTree * pst);
+    void parse_continue(SyntTree * pst);
     void parse_oper_in(SyntTree * pst);
     void parse_oper_out(SyntTree * pst);
     void parse_expr(SyntTree * pst);

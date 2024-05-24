@@ -110,8 +110,10 @@ std::string SyntTree::get_typename() const
         return "WHILE";
     } else if (type == NODE_UNTIL) {
         return "UNTIL";
-    } else if (type == NODE_OPER_LOOP) {
-        return "OPER_LOOP";
+    } else if (type == NODE_BREAK) {
+        return "BREAK";
+    } else if (type == NODE_CONTINUE) {
+        return "CONTINUE";
     } else if (type == NODE_OPER_IN) {
         return "OPER_IN";
     } else if (type == NODE_OPER_OUT) {
@@ -225,8 +227,10 @@ void Parser::parse_statement(SyntTree * pst)
         parse_while(pst);
     } else if (cur_lex.type() == LEX_DO) {
         parse_until(pst);
-    } else if (cur_lex.type() == LEX_OPER_LOOP) {
-        parse_oper_loop(pst);
+    } else if (cur_lex.type() == LEX_BREAK) {
+        parse_break(pst);
+    } else if (cur_lex.type() == LEX_CONTINUE) {
+        parse_continue(pst);
     } else if (cur_lex.type() == LEX_OPER_IN) {
         parse_oper_in(pst);
     } else if (cur_lex.type() == LEX_OPER_OUT) {
@@ -341,7 +345,9 @@ void Parser::parse_for(SyntTree * pst)
     }
 
     get_lex();
+    ++loop_depth;
     parse_statement(pst);
+    --loop_depth;
 }
 
 void Parser::parse_for_init(SyntTree * pst)
@@ -364,7 +370,9 @@ void Parser::parse_while(SyntTree * pst)
         err();
     }
     get_lex();
+    ++loop_depth;
     parse_statement(pst);
+    --loop_depth;
 }
 
 void Parser::parse_until(SyntTree * pst)
@@ -372,7 +380,9 @@ void Parser::parse_until(SyntTree * pst)
     pst = pst->add_suc(NODE_UNTIL);
 
     get_lex();
+    ++loop_depth;
     parse_statement(pst);
+    --loop_depth;
     if (cur_lex.type() != LEX_UNTIL) {
         err();
     }
@@ -386,9 +396,25 @@ void Parser::parse_until(SyntTree * pst)
     get_lex();
 }
 
-void Parser::parse_oper_loop(SyntTree * pst)
+void Parser::parse_break(SyntTree * pst)
 {
-    pst = pst->add_suc(NODE_OPER_LOOP, cur_lex.word());
+    pst = pst->add_suc(NODE_BREAK, cur_lex.word());
+
+    if (loop_depth == 0) {
+        err("A break statement may only be used within a loop");
+    }
+
+    get_lex(LEX_OPER_END);
+    get_lex();
+}
+
+void Parser::parse_continue(SyntTree * pst)
+{
+    pst = pst->add_suc(NODE_CONTINUE, cur_lex.word());
+
+    if (loop_depth == 0) {
+        err("A continue statement may only be used within a loop");
+    }
 
     get_lex(LEX_OPER_END);
     get_lex();
@@ -466,7 +492,7 @@ void Parser::parse_expr2(SyntTree * pst, bool is_lval)
     }
 }
 
-Parser::Parser(std::ifstream & ifs): ifs(ifs), tid(), st(NODE_BEGIN), cur_lex(), sc(ifs)
+Parser::Parser(std::ifstream & ifs): ifs(ifs), tid(), st(NODE_BEGIN), cur_lex(), sc(ifs), loop_depth(0)
 {
     parse_program();
 }
