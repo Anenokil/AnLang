@@ -5,5 +5,6 @@ There are following modules:
 * chtype
 * tid
 * lex
-* synt
+* synt_tree
+* parser
 * main.cpp
