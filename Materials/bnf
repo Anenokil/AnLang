@@ -13,15 +13,16 @@
     <const_str> ::= <quot> {<str_quant>} <quot>
         <str_quant> ::= any_ASCII_character_except_quot
 
-<expr> ::= (<rval> {<oper_noret> <rval>}) | (<lval> <oper_ret> <expr>)
-    <lval> ::= <id>
-    <rval> ::= <id> | <const> | ("(" <expr> ")")
-    <oper_noret> ::= <op_arithm> | <op_logic> | <op_cmp>
+<expr> ::= (<lval> <oper_ret> <expr>) | (<lval> {<oper_noret> <lrval>}) | (<rval> {<oper_noret> <lrval>})
+    <lrval> ::= <lval> | <rval>
+        <lval> ::= <id>
+        <rval> ::= <const> | ("(" <expr> ")") | (<oper_1> <lrval>)
+    <oper_1> ::= "-" | "~"
+    <oper_2_ret> ::= "="
+    <oper_2_noret> ::= <op_arithm> | <op_logic> | <op_cmp>
         <op_arithm> ::= "+" | "-" | "*" | "/" | "%"
-        <op_logic> ::= "+" | "*" | "~"
+        <op_logic> ::= "+" | "*"
         <op_cmp> ::= "==" | "!=" | ">" | ">=" | "<" | "<="
-    <oper_ret> ::= <op_assign>
-        <op_assign> ::= "="
 
 <type> ::= "int" | "float" | "bool" | "str"
 
