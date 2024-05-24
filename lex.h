@@ -5,34 +5,33 @@
 #include <string>
 
 enum LexType {
-    LEX_TMP, // initial temporary value
+    LEX_NULL, // initial temporary value
     LEX_BEGIN,
-    LEX_TYPE,
+    LEX_INT, LEX_FLOAT, LEX_BOOL, LEX_STR,
     LEX_ID,
-    LEX_INT_CONST,
-    LEX_FLOAT_CONST,
-    LEX_BOOL_CONST,
-    LEX_STR_CONST,
-    LEX_OPER_COMMA,
-    LEX_OPER_END,
-    LEX_BREAK,
-    LEX_CONTINUE,
-    LEX_OPER_IN,
-    LEX_OPER_OUT,
-    LEX_OPER_2_NORET,
-    LEX_OPER_2_RET,
-    LEX_IF,
-    LEX_ELSE,
+    LEX_INT_CONST, LEX_FLOAT_CONST, LEX_BOOL_CONST, LEX_STR_CONST,
+    LEX_COMMA,
+    LEX_SEMICOLON,
+    LEX_BREAK, LEX_CONTINUE,
+    LEX_OPER_IN, LEX_OPER_OUT,
+    LEX_ADD, LEX_SUB, LEX_MULT, LEX_DIV, LEX_REM,
+    LEX_EQ, LEX_NE, LEX_L, LEX_LE, LEX_G, LEX_GE,
+    LEX_NOT, LEX_AND, LEX_OR,
+    LEX_ASSIGN,
+    LEX_IF, LEX_ELSE,
     LEX_FOR,
     LEX_WHILE,
-    LEX_DO,
-    LEX_UNTIL,
-    LEX_SCOPE_L,
-    LEX_SCOPE_R,
-    LEX_PARENTHESIS_L,
-    LEX_PARENTHESIS_R,
+    LEX_DO, LEX_UNTIL,
+    LEX_BRACE_L, LEX_BRACE_R,
+    LEX_PARENTHESIS_L, LEX_PARENTHESIS_R,
     LEX_EOF,
 };
+
+bool is_type(LexType lt);
+bool is_const(LexType lt);
+bool is_oper_1(LexType lt);
+bool is_oper_2_ret(LexType lt);
+bool is_oper_2_noret(LexType lt);
 
 class Lex
 {

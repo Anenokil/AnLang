@@ -184,7 +184,7 @@ void Parser::parse_program()
     get_lex(LEX_BEGIN);
     SyntTree * pst = &st;
 
-    get_lex(LEX_SCOPE_L);
+    get_lex(LEX_BRACE_L);
     parse_scope(pst);
 
     if (cur_lex.type() != LEX_EOF) {
@@ -197,7 +197,7 @@ void Parser::parse_scope(SyntTree * pst)
     pst = pst->add_suc(NODE_SCOPE);
 
     get_lex();
-    while (cur_lex.type() != LEX_SCOPE_R) {
+    while (cur_lex.type() != LEX_BRACE_R) {
         parse_statement(pst);
     }
     get_lex();
@@ -205,17 +205,17 @@ void Parser::parse_scope(SyntTree * pst)
 
 void Parser::parse_statement(SyntTree * pst)
 {
-    if (cur_lex.type() == LEX_SCOPE_L) {
+    if (cur_lex.type() == LEX_BRACE_L) {
         parse_scope(pst);
-    } else if (cur_lex.type() == LEX_TYPE) {
+    } else if (is_type(cur_lex.type())) {
         parse_decl(pst);
-        if (cur_lex.type() != LEX_OPER_END) {
+        if (cur_lex.type() != LEX_SEMICOLON) {
             err();
         }
         get_lex();
     } else if (cur_lex.type() == LEX_ID) {
         parse_assign(pst);
-        if (cur_lex.type() != LEX_OPER_END) {
+        if (cur_lex.type() != LEX_SEMICOLON) {
             err();
         }
         get_lex();
@@ -247,7 +247,7 @@ void Parser::parse_decl(SyntTree * pst)
     do {
         get_lex(LEX_ID);
         parse_decl_id(pst);
-    } while (cur_lex.type() == LEX_OPER_COMMA);
+    } while (cur_lex.type() == LEX_COMMA);
 }
 
 void Parser::parse_decl_id(SyntTree * pst)
@@ -260,11 +260,11 @@ void Parser::parse_decl_id(SyntTree * pst)
     }
 
     get_lex();
-    if (cur_lex.type() == LEX_OPER_2_RET) {
+    if (is_oper_2_ret(cur_lex.type())) {
         parse_decl_init(pst);
-    } else if(cur_lex.type() == LEX_OPER_COMMA) {
+    } else if(cur_lex.type() == LEX_COMMA) {
         // return;
-    } else if (cur_lex.type() == LEX_OPER_END) {
+    } else if (cur_lex.type() == LEX_SEMICOLON) {
         // return;
     } else {
         err();
@@ -276,9 +276,9 @@ void Parser::parse_decl_init(SyntTree * pst)
     get_lex();
     parse_expr(pst);
 
-    if (cur_lex.type() == LEX_OPER_COMMA) {
+    if (cur_lex.type() == LEX_COMMA) {
         // return;
-    } else if (cur_lex.type() == LEX_OPER_END) {
+    } else if (cur_lex.type() == LEX_SEMICOLON) {
         // return;
     } else {
         err();
@@ -294,10 +294,13 @@ void Parser::parse_assign(SyntTree * pst)
     }
 
     do {
-        get_lex(LEX_OPER_2_RET);
+        get_lex();
+        if (!is_oper_2_ret(cur_lex.type())) {
+            err();
+        }
         get_lex();
         parse_expr(pst);
-    } while (cur_lex.type() == LEX_OPER_COMMA);
+    } while (cur_lex.type() == LEX_COMMA);
 }
 
 void Parser::parse_if(SyntTree * pst)
@@ -328,13 +331,13 @@ void Parser::parse_for(SyntTree * pst)
 
     get_lex();
     parse_for_init(pst);
-    if (cur_lex.type() != LEX_OPER_END) {
+    if (cur_lex.type() != LEX_SEMICOLON) {
         err();
     }
 
     get_lex();
     parse_expr(pst);
-    if (cur_lex.type() != LEX_OPER_END) {
+    if (cur_lex.type() != LEX_SEMICOLON) {
         err();
     }
 
@@ -352,7 +355,7 @@ void Parser::parse_for(SyntTree * pst)
 
 void Parser::parse_for_init(SyntTree * pst)
 {
-    if (cur_lex.type() == LEX_TYPE) {
+    if (is_type(cur_lex.type())) {
         parse_decl(pst);
     } else if (cur_lex.type() == LEX_ID) {
         parse_assign(pst);
@@ -392,7 +395,7 @@ void Parser::parse_until(SyntTree * pst)
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
         err();
     }
-    get_lex(LEX_OPER_END);
+    get_lex(LEX_SEMICOLON);
     get_lex();
 }
 
@@ -404,7 +407,7 @@ void Parser::parse_break(SyntTree * pst)
         err("A break statement may only be used within a loop");
     }
 
-    get_lex(LEX_OPER_END);
+    get_lex(LEX_SEMICOLON);
     get_lex();
 }
 
@@ -416,7 +419,7 @@ void Parser::parse_continue(SyntTree * pst)
         err("A continue statement may only be used within a loop");
     }
 
-    get_lex(LEX_OPER_END);
+    get_lex(LEX_SEMICOLON);
     get_lex();
 }
 
@@ -429,7 +432,7 @@ void Parser::parse_oper_in(SyntTree * pst)
         err("The variable is not declared");
     }
 
-    get_lex(LEX_OPER_END);
+    get_lex(LEX_SEMICOLON);
     get_lex();
 }
 
@@ -440,8 +443,8 @@ void Parser::parse_oper_out(SyntTree * pst)
     do {
         get_lex();
         parse_expr(pst);
-    } while (cur_lex.type() == LEX_OPER_COMMA);
-    if (cur_lex.type() != LEX_OPER_END) {
+    } while (cur_lex.type() == LEX_COMMA);
+    if (cur_lex.type() != LEX_SEMICOLON) {
         err();
     }
     get_lex();
@@ -461,7 +464,7 @@ void Parser::parse_expr2(SyntTree * pst, bool is_lval)
             err("The variable is not declared");
         }
         pst->add_suc(NODE_OPERAND, cur_lex.word());
-    } else if (cur_lex.type() == LEX_INT_CONST || cur_lex.type() == LEX_FLOAT_CONST || cur_lex.type() == LEX_BOOL_CONST || cur_lex.type() == LEX_STR_CONST) {
+    } else if (is_const(cur_lex.type())) {
         is_lval = false;
         pst->add_suc(NODE_OPERAND, cur_lex.word());
     } else if (cur_lex.type() == LEX_PARENTHESIS_L) {
@@ -476,14 +479,14 @@ void Parser::parse_expr2(SyntTree * pst, bool is_lval)
     }
 
     get_lex();
-    if (cur_lex.type() == LEX_OPER_2_RET) {
+    if (is_oper_2_ret(cur_lex.type())) {
         if (!is_lval) {
             err("Invalid left operand");
         }
         pst->add_suc(NODE_OPER_2, cur_lex.word());
         get_lex();
         parse_expr2(pst, true);
-    } else if (cur_lex.type() == LEX_OPER_2_NORET) {
+    } else if (is_oper_2_noret(cur_lex.type())) {
         pst->add_suc(NODE_OPER_2, cur_lex.word());
         get_lex();
         parse_expr2(pst, false);

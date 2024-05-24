@@ -31,18 +31,18 @@ namespace rw
     std::string const OPER_MULT = "*";
     std::string const OPER_DIV = "/";
     std::string const OPER_REM = "%";
-    std::string const OPER_AND = "*";
-    std::string const OPER_OR = "+";
-    std::string const OPER_NOT = "~";
     std::string const OPER_EQ = "==";
     std::string const OPER_NE = "!=";
     std::string const OPER_L = "<";
     std::string const OPER_LE = "<=";
     std::string const OPER_G = ">";
     std::string const OPER_GE = ">=";
+    std::string const OPER_NOT = "~";
+    std::string const OPER_AND = "*";
+    std::string const OPER_OR = "+";
     std::string const OPER_ASSIGN = "=";
     std::string const OPER_COMMA = ",";
-    std::string const OPER_END = ";";
+    std::string const OPER_SEMICOLON = ";";
 
     std::string const PAR_BEG = "(";
     std::string const PAR_END = ")";

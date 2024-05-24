@@ -14,6 +14,28 @@ enum FlagVal {
     FL_ERROR,
 };
 
+bool is_type(LexType lt) {
+    return lt == LEX_INT || lt == LEX_FLOAT || lt == LEX_BOOL || lt == LEX_STR;
+}
+
+bool is_const(LexType lt) {
+    return lt == LEX_INT_CONST || lt == LEX_FLOAT_CONST || lt == LEX_BOOL_CONST || lt == LEX_STR_CONST;
+}
+
+bool is_oper_1(LexType lt) {
+    return lt == LEX_ADD || lt == LEX_SUB || lt == LEX_NOT;
+}
+
+bool is_oper_2_ret(LexType lt) {
+    return lt == LEX_ASSIGN;
+}
+
+bool is_oper_2_noret(LexType lt) {
+    return lt == LEX_ADD || lt == LEX_SUB || lt == LEX_MULT || lt == LEX_DIV || lt == LEX_REM ||
+            lt == LEX_EQ || lt == LEX_NE || lt == LEX_L || lt == LEX_LE || lt == LEX_G || lt == LEX_GE ||
+            lt == LEX_AND || lt == LEX_OR;
+}
+
 bool _is_id(std::string const & word)
 {
     for (char c: word) {
@@ -67,28 +89,41 @@ Lex::Lex(std::string const & word, LexType type, unsigned row, unsigned col): wo
 LexType Lex::define_lex_type()
 {
     if (word_ == rw::BEGIN) return LEX_BEGIN;
-    if (word_ == rw::OPER_COMMA) return LEX_OPER_COMMA;
-    if (word_ == rw::OPER_END) return LEX_OPER_END;
+    if (word_ == rw::TYPE_INT) return LEX_INT;
+    if (word_ == rw::TYPE_FLOAT) return LEX_FLOAT;
+    if (word_ == rw::TYPE_BOOL) return LEX_BOOL;
+    if (word_ == rw::TYPE_STR) return LEX_STR;
+    if (word_ == rw::OPER_COMMA) return LEX_COMMA;
+    if (word_ == rw::OPER_SEMICOLON) return LEX_SEMICOLON;
     if (word_ == rw::OPER_BREAK) return LEX_BREAK;
     if (word_ == rw::OPER_CONT) return LEX_CONTINUE;
     if (word_ == rw::OPER_READ) return LEX_OPER_IN;
     if (word_ == rw::OPER_WRITE) return LEX_OPER_OUT;
-    if (word_ == rw::OPER_ADD || word_ == rw::OPER_SUB || word_ == rw::OPER_MULT || word_ == rw::OPER_DIV ||
-        word_ == rw::OPER_REM || word_ == rw::OPER_AND || word_ == rw::OPER_OR || word_ == rw::OPER_NOT ||
-        word_ == rw::OPER_EQ || word_ == rw::OPER_NE || word_ == rw::OPER_L || word_ == rw::OPER_LE ||
-        word_ == rw::OPER_G || word_ == rw::OPER_GE) return LEX_OPER_2_NORET;
-    if (word_ == rw::OPER_ASSIGN) return LEX_OPER_2_RET;
+    if (word_ == rw::OPER_ADD) return LEX_ADD;
+    if (word_ == rw::OPER_SUB) return LEX_SUB;
+    if (word_ == rw::OPER_MULT) return LEX_MULT;
+    if (word_ == rw::OPER_DIV) return LEX_DIV;
+    if (word_ == rw::OPER_REM) return LEX_REM;
+    if (word_ == rw::OPER_EQ) return LEX_EQ;
+    if (word_ == rw::OPER_NE) return LEX_NE;
+    if (word_ == rw::OPER_L) return LEX_L;
+    if (word_ == rw::OPER_LE) return LEX_LE;
+    if (word_ == rw::OPER_G) return LEX_G;
+    if (word_ == rw::OPER_GE) return LEX_GE;
+    if (word_ == rw::OPER_NOT) return LEX_NOT;
+    if (word_ == rw::OPER_AND) return LEX_AND;
+    if (word_ == rw::OPER_OR) return LEX_OR;
+    if (word_ == rw::OPER_ASSIGN) return LEX_ASSIGN;
     if (word_ == rw::OPER_IF) return LEX_IF;
     if (word_ == rw::OPER_ELSE) return LEX_ELSE;
     if (word_ == rw::OPER_FOR) return LEX_FOR;
     if (word_ == rw::OPER_WHILE) return LEX_WHILE;
     if (word_ == rw::OPER_DO) return LEX_DO;
     if (word_ == rw::OPER_UNTIL) return LEX_UNTIL;
-    if (word_ == rw::SCOPE_BEG) return LEX_SCOPE_L;
-    if (word_ == rw::SCOPE_END) return LEX_SCOPE_R;
+    if (word_ == rw::SCOPE_BEG) return LEX_BRACE_L;
+    if (word_ == rw::SCOPE_END) return LEX_BRACE_R;
     if (word_ == rw::PAR_BEG) return LEX_PARENTHESIS_L;
     if (word_ == rw::PAR_END) return LEX_PARENTHESIS_R;
-    if (word_ == rw::TYPE_INT || word_ == rw::TYPE_FLOAT || word_ == rw::TYPE_BOOL || word_ == rw::TYPE_STR) return LEX_TYPE;
     if (_is_int_const(word_)) return LEX_INT_CONST;
     if (_is_float_const(word_)) return LEX_FLOAT_CONST;
     if (_is_bool_const(word_)) return LEX_BOOL_CONST;
@@ -98,7 +133,7 @@ LexType Lex::define_lex_type()
             " column: Unknown lexeme: '" + word_ + "'.");
 }
 
-Lex::Lex(): word_(""), type_(LEX_TMP), row_(0), col_(0)
+Lex::Lex(): word_(""), type_(LEX_NULL), row_(0), col_(0)
 {}
 
 Lex::Lex(std::string const & str, unsigned row, unsigned col): word_(str), row_(row), col_(col)
