@@ -184,21 +184,33 @@ void Parser::parse_for(SyntTree * pst)
     get_lex(LEX_PARENTHESIS_L);
 
     get_lex();
-    parse_for_init(pst);
     if (cur_lex.type() != LEX_SEMICOLON) {
-        err();
+        parse_for_init(pst);
+        if (cur_lex.type() != LEX_SEMICOLON) {
+            err();
+        }
+    } else {
+        pst->add_suc(NODE_FOR_INIT);
     }
 
     get_lex();
-    parse_expr(pst);
     if (cur_lex.type() != LEX_SEMICOLON) {
-        err();
+        parse_expr(pst);
+        if (cur_lex.type() != LEX_SEMICOLON) {
+            err();
+        }
+    } else {
+        pst->add_suc(NODE_EXPR);
     }
 
     get_lex();
-    parse_assign(pst);
     if (cur_lex.type() != LEX_PARENTHESIS_R) {
-        err();
+        parse_assign(pst);
+        if (cur_lex.type() != LEX_PARENTHESIS_R) {
+            err();
+        }
+    } else {
+        pst->add_suc(NODE_ASSIGN);
     }
 
     get_lex();
@@ -255,7 +267,7 @@ void Parser::parse_until(SyntTree * pst)
 
 void Parser::parse_break(SyntTree * pst)
 {
-    pst = pst->add_suc(NODE_BREAK, cur_lex.word());
+    pst = pst->add_suc(NODE_BREAK);
 
     if (loop_depth == 0) {
         err("A break statement may only be used within a loop");
@@ -267,7 +279,7 @@ void Parser::parse_break(SyntTree * pst)
 
 void Parser::parse_continue(SyntTree * pst)
 {
-    pst = pst->add_suc(NODE_CONTINUE, cur_lex.word());
+    pst = pst->add_suc(NODE_CONTINUE);
 
     if (loop_depth == 0) {
         err("A continue statement may only be used within a loop");
@@ -309,7 +321,7 @@ void Parser::parse_expr(SyntTree * pst)
     pst = pst->add_suc(NODE_EXPR);
 
     if (is_oper_1(cur_lex.type())) {
-        pst->add_suc(NODE_OPERAND, cur_lex.word());
+        pst->add_suc(NODE_OPER_1, cur_lex.word());
         get_lex();
         parse_expr2(pst, false);
     } else {

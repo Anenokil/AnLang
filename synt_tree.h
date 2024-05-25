@@ -15,8 +15,6 @@ enum NodeType {
     NODE_IF,
     NODE_FOR,
     NODE_FOR_INIT,
-    NODE_FOR_COND,
-    NODE_FOR_ITER,
     NODE_WHILE,
     NODE_UNTIL,
     NODE_BREAK,
@@ -25,6 +23,7 @@ enum NodeType {
     NODE_OPER_OUT,
     NODE_EXPR,
     NODE_OPERAND,
+    NODE_OPER_1,
     NODE_OPER_2,
 };
 

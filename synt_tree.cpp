@@ -100,10 +100,6 @@ std::string SyntTree::get_typename() const
         return "FOR";
     } else if (type == NODE_FOR_INIT) {
         return "FOR_INIT";
-    } else if (type == NODE_FOR_COND) {
-        return "FOR_COND";
-    } else if (type == NODE_FOR_ITER) {
-        return "FOR_ITER";
     } else if (type == NODE_WHILE) {
         return "WHILE";
     } else if (type == NODE_UNTIL) {
@@ -118,6 +114,8 @@ std::string SyntTree::get_typename() const
         return "OPER_OUT";
     } else if (type == NODE_EXPR) {
         return "EXPR";
+    } else if (type == NODE_OPER_1) {
+        return "OPER_1";
     } else if (type == NODE_OPER_2) {
         return "OPER_2";
     } else if (type == NODE_OPERAND) {
