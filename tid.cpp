@@ -3,14 +3,14 @@
 #include <algorithm> // std::find()
 #include "reserved.h"
 
-TID::TIDLine::TIDLine(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw)
+TID::ID::ID(std::string const & type_raw, std::string const & name_raw, std::string const & init_raw)
 {
     set_type(type_raw);
     set_name(name_raw);
     set_init(init_raw);
 }
 
-void TID::TIDLine::set_type(std::string const & type_raw)
+void TID::ID::set_type(std::string const & type_raw)
 {
     if (type_raw == rw::TYPE_INT) {
         type_ = ID_TYPE_INT;
@@ -25,22 +25,22 @@ void TID::TIDLine::set_type(std::string const & type_raw)
     }
 }
 
-void TID::TIDLine::set_name(std::string const & name_raw)
+void TID::ID::set_name(std::string const & name_raw)
 {
     name_ = name_raw; // Без перекрытия имён
 }
 
-void TID::TIDLine::set_init(std::string const & init_raw)
+void TID::ID::set_init(std::string const & init_raw)
 {
     init_ = init_raw;
 }
 
-IDType TID::TIDLine::get_type() const
+IDType TID::ID::get_type() const
 {
     return type_;
 }
 
-std::string TID::TIDLine::get_typename() const
+std::string TID::ID::get_typename() const
 {
     if (type_ == ID_TYPE_INT) {
         return rw::TYPE_INT;
@@ -55,27 +55,27 @@ std::string TID::TIDLine::get_typename() const
     }
 }
 
-std::string TID::TIDLine::get_name() const
+std::string TID::ID::get_name() const
 {
     return name_;
 }
 
-std::string TID::TIDLine::get_init() const
+std::string TID::ID::get_init() const
 {
     return init_;
 }
 
-bool TID::TIDLine::operator==(TIDLine const & other) const
+bool TID::ID::operator==(ID const & other) const
 {
     return name_ == other.name_;
 }
 
-bool TID::TIDLine::operator!=(TIDLine const & other) const
+bool TID::ID::operator!=(ID const & other) const
 {
     return !(*this == other);
 }
 
-std::ostream & TID::TIDLine::print(std::ostream & os) const
+std::ostream & TID::ID::print(std::ostream & os) const
 {
     os << get_typename() << " " << name_ << " {" << init_ << "}";
     return os;
@@ -83,7 +83,7 @@ std::ostream & TID::TIDLine::print(std::ostream & os) const
 
 int TID::find(std::string const & name) const
 {
-    TIDLine tmp("", name, "");
+    ID tmp("", name, "");
     auto it = std::find(lines_.begin(), lines_.end(), tmp);
     if (it == lines_.end()) {
         return -1;
@@ -94,7 +94,7 @@ int TID::find(std::string const & name) const
 
 bool TID::add(std::string const & type, std::string const & name, std::string const & init)
 {
-    TIDLine new_line(type, name, init);
+    ID new_line(type, name, init);
     if (std::find(lines_.begin(), lines_.end(), new_line) == lines_.end()) {
         lines_.push_back(new_line);
         return true;
@@ -105,7 +105,7 @@ bool TID::add(std::string const & type, std::string const & name, std::string co
 
 bool TID::set_init(std::string const & name, std::string const & init)
 {
-    TIDLine new_line("", name, "");
+    ID new_line("", name, "");
     auto it = std::find(lines_.begin(), lines_.end(), new_line);
     if (it == lines_.end()) {
         return false;
